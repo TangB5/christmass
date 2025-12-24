@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import Navbar from '@/components/Navbar';
@@ -14,7 +14,8 @@ import {
     ArrowRight,
     Zap,
     Stars,
-    Globe
+    Globe,
+    Bell
 } from 'lucide-react';
 
 const containerVariants = {
@@ -35,24 +36,22 @@ const itemVariants = {
 
 export default function HomePage() {
     const router = useRouter();
+    const [showProModal, setShowProModal] = useState(false);
 
     return (
         <div className="min-h-screen flex flex-col items-center bg-[#030712] text-white selection:bg-red-500/30 overflow-x-hidden">
-            {/* Background avec effets de lumière */}
             <div className="fixed inset-0 -z-10">
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-christmas-red/20 rounded-full blur-[120px] animate-pulse" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-christmas-green/10 rounded-full blur-[120px]" />
                 <div className="absolute inset-0 opacity-[0.15] mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
             </div>
 
-
+            <Navbar />
 
             <main className="max-w-6xl w-full px-4 pt-32 pb-20 relative z-10">
                 {/* Hero Section */}
                 <motion.section
-                    initial="hidden"
-                    animate="visible"
-                    variants={containerVariants}
+                    initial="hidden" animate="visible" variants={containerVariants}
                     className="text-center mb-32"
                 >
                     <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-christmas-gold text-xs font-bold mb-8 backdrop-blur-md">
@@ -83,24 +82,17 @@ export default function HomePage() {
                     </motion.div>
                 </motion.section>
 
-                {/* Features Bento Grid - LES DEUX PLANS RESTAURÉS */}
+                {/* Features Bento Grid */}
                 <div className="grid md:grid-cols-2 gap-8 mb-32">
-                    {/* Carte Particulier / Famille */}
-                    <motion.div
-                        whileHover={{ y: -10 }}
-                        className="group relative bg-gradient-to-b from-white/10 to-transparent backdrop-blur-2xl rounded-[3rem] p-12 border border-white/10 overflow-hidden"
-                    >
+                    {/* Carte Famille */}
+                    <motion.div whileHover={{ y: -10 }} className="group relative bg-gradient-to-b from-white/10 to-transparent backdrop-blur-2xl rounded-[3rem] p-12 border border-white/10 overflow-hidden">
                         <div className="absolute -right-20 -top-20 w-64 h-64 bg-christmas-red/10 rounded-full blur-[80px] group-hover:bg-christmas-red/20 transition-colors" />
-
                         <div className="relative z-10">
                             <div className="w-16 h-16 bg-red-500/20 text-christmas-red rounded-2xl flex items-center justify-center mb-10 border border-red-500/20 shadow-[0_0_15px_rgba(220,38,38,0.2)]">
                                 <Sparkles className="w-8 h-8" />
                             </div>
-                            <h2 className="text-4xl font-bold mb-4">Pour la Famille</h2>
-                            <p className="text-gray-400 text-lg mb-10 leading-relaxed">
-                                Transformez vos souvenirs en poésie. Notre IA compose des textes touchants adaptés à vos relations.
-                            </p>
-
+                            <h2 className="text-4xl font-bold mb-4 italic font-serif">Pour la Famille</h2>
+                            <p className="text-gray-400 text-lg mb-10">Transformez vos souvenirs en poésie. IA adaptée à vos relations.</p>
                             <div className="grid grid-cols-1 gap-4 mb-10">
                                 {["Thèmes féériques", "Poèmes personnalisés", "Lien de partage unique"].map((item, i) => (
                                     <div key={i} className="flex items-center gap-3 text-gray-300">
@@ -109,42 +101,44 @@ export default function HomePage() {
                                     </div>
                                 ))}
                             </div>
-                            <Button
-                                onClick={() => router.push('/create')}
-                                className="w-full h-14 rounded-xl text-black font-bold  hover:bg-gray-200 transition-all">
-                                Lancer le Studio
-                            </Button>
+                            <Button onClick={() => router.push('/create')} className="w-full h-14 rounded-xl text-black font-bold  hover:bg-gray-200">Lancer le Studio</Button>
                         </div>
                     </motion.div>
 
-                    {/* Carte Business / Pro */}
+                    {/* Carte Business (UPCOMING) */}
                     <motion.div
-                        whileHover={{ y: -10 }}
-                        className="group relative bg-gradient-to-b from-white/10 to-transparent backdrop-blur-2xl rounded-[3rem] p-12 border border-white/10 overflow-hidden"
+                        whileHover={{ y: -5 }}
+                        className="group relative bg-white/5 backdrop-blur-2xl rounded-[3rem] p-12 border border-white/5 overflow-hidden opacity-80"
                     >
-                        <div className="absolute -right-20 -top-20 w-64 h-64 bg-christmas-green/10 rounded-full blur-[80px] group-hover:bg-christmas-green/20 transition-colors" />
+                        {/* Badge */}
+                        <div className="absolute top-8 right-8 z-20">
+                            <span className="bg-christmas-gold/10 text-christmas-gold text-[10px] font-black px-4 py-1.5 rounded-full border border-christmas-gold/20 tracking-widest uppercase">
+                                Bientôt disponible
+                            </span>
+                        </div>
 
                         <div className="relative z-10">
-                            <div className="w-16 h-16 bg-green-500/20 text-christmas-green rounded-2xl flex items-center justify-center mb-10 border border-green-500/20 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                            <div className="w-16 h-16 bg-white/5 text-gray-500 rounded-2xl flex items-center justify-center mb-10 border border-white/10">
                                 <Users className="w-8 h-8" />
                             </div>
-                            <h2 className="text-4xl font-bold mb-4">Pour le Business</h2>
-                            <p className="text-gray-400 text-lg mb-10 leading-relaxed">
-                                Automatisez vos vœux d'entreprise. Envoyez des cartes personnalisées avec votre logo et branding.
-                            </p>
+                            <h2 className="text-4xl font-bold mb-4 text-gray-300 italic font-serif">Pour le Business</h2>
+                            <p className="text-gray-500 text-lg mb-10">Automatisez vos vœux d'entreprise avec votre logo et branding.</p>
 
                             <div className="grid grid-cols-1 gap-4 mb-10">
                                 {["Export GIF haute qualité", "Branding Entreprise", "Support prioritaire"].map((item, i) => (
-                                    <div key={i} className="flex items-center gap-3 text-gray-300">
-                                        <CheckCircle2 className="w-5 h-5 text-christmas-green" />
+                                    <div key={i} className="flex items-center gap-3 text-gray-600 italic">
+                                        <CheckCircle2 className="w-5 h-5 text-gray-800" />
                                         <span>{item}</span>
                                     </div>
                                 ))}
                             </div>
+
                             <Button
-                                onClick={() => router.push('/create')}
-                                variant="outline" className="w-full h-14 rounded-xl border-white/20 text-white hover:bg-white/5 transition-all">
-                                Découvrir l'offre Pro
+                                onClick={() => setShowProModal(true)}
+                                variant="outline"
+                                className="w-full h-14 rounded-xl border-white/10 text-gray-500 hover:bg-white/5"
+                            >
+                                En savoir plus
                             </Button>
                         </div>
                     </motion.div>
@@ -167,13 +161,35 @@ export default function HomePage() {
                 </motion.div>
             </main>
 
-            {/* Footer */}
-            <footer className="w-full max-w-6xl px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-8 opacity-40 hover:opacity-100 transition-opacity">
+            {/* MODALE INTERNE POUR LE PACK PRO */}
+            <AnimatePresence>
+                {showProModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            onClick={() => setShowProModal(false)}
+                            className="absolute inset-0 bg-black/90 backdrop-blur-xl"
+                        />
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+                            className="relative w-full max-w-md bg-black border border-white/10 p-10 rounded-[3rem] text-center"
+                        >
+                            <Bell className="w-16 h-16 text-christmas-gold mx-auto mb-6 animate-bounce" />
+                            <h3 className="text-3xl font-black mb-4">Offre Business</h3>
+                            <p className="text-gray-400 mb-8">
+                                Nous finalisons les outils de personnalisation pour les entreprises.
+                                Ouverture prévue pour le 31 janvier 2025.
+                            </p>
+                            <Button onClick={() => setShowProModal(false)} className="w-full h-14 rounded-2xl  text-black font-bold">
+                                J'ai compris
+                            </Button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            <footer className="w-full max-w-6xl px-6 py-12 text-center opacity-40">
                 <p className="text-sm">© 2025 Vœux Magiques • L'IA au service du cœur</p>
-                <div className="flex gap-6 text-sm">
-                    <a href="#" className="hover:text-christmas-red">Mentions</a>
-                    <a href="#" className="hover:text-christmas-red">Contact</a>
-                </div>
             </footer>
         </div>
     );
