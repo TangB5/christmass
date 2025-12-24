@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { Language, Gender, GeneratedPoem } from "./types";
+import {Language, Gender, GeneratedPoem, TemplateId} from "./types";
 
 const API_KEY = process.env.GEMINI_API_KEY!;
 
@@ -95,4 +95,31 @@ export async function generatePoems(
     if (!jsonMatch) throw new Error("Format JSON invalide reçu de l'IA");
 
     return JSON.parse(jsonMatch[0]) as GeneratedPoem[];
+}
+
+/**
+ * Génère un seul poème en utilisant generatePoems
+ *//**
+ * Génère un seul poème, optionnellement selon un template spécifique
+ */
+export async function generateSinglePoem(
+    name: string,
+    gender: Gender,
+    language: Language,
+    templateId?: TemplateId // argument optionnel
+): Promise<GeneratedPoem> {
+    // Génère tous les poèmes
+    const poems = await generatePoems(name, gender, language);
+
+    // Si un templateId est fourni, on cherche le poème correspondant
+    if (templateId !== undefined) {
+        const poem = poems.find(p => p.template_id === templateId);
+        if (!poem) {
+            throw new Error(`Template ${templateId} non trouvé dans les poèmes générés`);
+        }
+        return poem;
+    }
+
+    // Sinon, retourne simplement le premier poème
+    return poems[0];
 }
