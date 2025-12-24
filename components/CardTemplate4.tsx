@@ -3,7 +3,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Sparkles, Diamond, Star, Snowflake, Zap } from 'lucide-react';
+import {
+    Sparkles,
+    Diamond,
+    Star,
+    Snowflake,
+    Crown,
+    Infinity as InfinityIcon,
+    Award
+} from 'lucide-react';
 
 interface CardTemplate4Props {
     name: string;
@@ -15,160 +23,144 @@ interface CardTemplate4Props {
 export default function CardTemplate4({ name, poem, imageUrl, language }: CardTemplate4Props) {
     const title = language === 'fr' ? 'Meilleurs Vœux' : 'Season\'s Greetings';
 
+
+    const goldGradient = "bg-gradient-to-b from-[#926339] via-[#e2c07d] to-[#926339]";
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-            className="relative w-full aspect-[3/4] bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 rounded-2xl overflow-hidden shadow-2xl"
+            transition={{ duration: 1.5 }}
+            className="relative w-full aspect-[3/4] bg-[#050505] rounded-[2rem] overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.8)] border border-white/5"
         >
-            {/* Elegant Background Pattern */}
-            <div className="absolute inset-0 opacity-5">
-                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <pattern id="elegant" width="60" height="60" patternUnits="userSpaceOnUse">
-                            <circle cx="30" cy="30" r="1" fill="white"/>
-                            <circle cx="0" cy="0" r="1" fill="white"/>
-                        </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#elegant)" />
-                </svg>
-            </div>
+            {/* 1. Texture de Fond (Grain subtil) */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/black-linen.png')]" />
 
-            {/* Subtle Golden Particles (Lucide Stars) */}
+            {/* 2. Éclairage Radial (Vignettage de luxe) */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,#1e293b_0%,transparent_70%)] opacity-40" />
+
+            {/* 3. Particules Dorées "Poussière d'Étoiles" */}
             <div className="absolute inset-0">
-                {[...Array(20)].map((_, i) => (
+                {[...Array(15)].map((_, i) => (
                     <motion.div
                         key={i}
-                        className="absolute text-christmas-gold/40"
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                        }}
+                        className="absolute text-christmas-gold/20"
+                        style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
                         animate={{
-                            opacity: [0, 0.8, 0],
-                            scale: [0.5, 1, 0.5],
+                            opacity: [0, 0.4, 0],
+                            scale: [0.8, 1.2, 0.8],
                         }}
                         transition={{
-                            duration: Math.random() * 3 + 2,
+                            duration: 4 + Math.random() * 4,
                             repeat: Infinity,
-                            delay: Math.random() * 3,
+                            delay: Math.random() * 5,
                         }}
                     >
-                        <Sparkles size={Math.random() * 12 + 4} />
+                        <Sparkles size={Math.random() * 10 + 5} />
                     </motion.div>
                 ))}
             </div>
 
-            {/* Elegant Border */}
-            <div className="absolute inset-6">
-                <div className="w-full h-full border border-christmas-gold/20 rounded-lg backdrop-shadow-sm" />
-            </div>
+            {/* 4. Cadre Double "Hairline" */}
+            <div className="absolute inset-8 border border-christmas-gold/10 rounded-lg" />
+            <div className="absolute inset-10 border border-christmas-gold/30 rounded-lg" />
 
-            {/* Content */}
-            <div className="relative h-full flex flex-col items-center justify-between p-10 z-10">
+            {/* 5. Contenu */}
+            <div className="relative h-full flex flex-col items-center justify-between py-16 px-12 z-10 text-center">
 
-                {/* Elegant Header */}
+                {/* Header: Sceau de Qualité */}
                 <motion.div
-                    initial={{ y: -30, opacity: 0 }}
+                    initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3, duration: 0.8 }}
-                    className="text-center space-y-4"
+                    transition={{ delay: 0.5, duration: 1 }}
+                    className="space-y-6"
                 >
-                    <div className="flex justify-center items-center gap-4">
-                        <motion.div
-                            className="w-16 h-px bg-gradient-to-r from-transparent via-christmas-gold to-transparent"
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: 1 }}
-                            transition={{ delay: 0.5, duration: 1 }}
-                        />
-                        <Diamond className="text-christmas-gold w-4 h-4 fill-christmas-gold animate-pulse" />
-                        <motion.div
-                            className="w-16 h-px bg-gradient-to-r from-transparent via-christmas-gold to-transparent"
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: 1 }}
-                            transition={{ delay: 0.5, duration: 1 }}
-                        />
+                    <div className="flex justify-center items-center gap-6">
+                        <div className="w-12 h-[0.5px] bg-christmas-gold/40" />
+                        <Diamond className="text-christmas-gold w-3 h-3 fill-christmas-gold rotate-45" />
+                        <div className="w-12 h-[0.5px] bg-christmas-gold/40" />
                     </div>
-                    <h1 className="text-4xl font-serif text-christmas-gold tracking-[0.2em] uppercase">
+                    <h1 className="text-2xl md:text-3xl font-serif text-transparent bg-clip-text bg-gradient-to-b from-[#e2c07d] to-[#926339] tracking-[0.5em] uppercase font-light">
                         {title}
                     </h1>
                 </motion.div>
 
-                {/* Centered Image or Name */}
+                {/* Portrait Section: L'effet "Médaillon" */}
                 <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
+                    initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.5, duration: 0.8 }}
+                    transition={{ delay: 0.8, duration: 1.2 }}
                     className="flex-1 flex items-center justify-center"
                 >
                     {imageUrl ? (
                         <div className="relative group">
-                            <div className="absolute inset-0 bg-christmas-gold/10 blur-2xl rounded-full group-hover:bg-christmas-gold/20 transition-all" />
-                            <div className="relative w-48 h-48 rounded-full overflow-hidden border border-christmas-gold/50 shadow-[0_0_30px_rgba(196,30,58,0.2)]">
-                                <Image
-                                    src={imageUrl}
-                                    alt={name}
-                                    fill
-                                    className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
-                                />
+                            {/* Halo d'or pulsant */}
+                            <div className="absolute inset-0 bg-christmas-gold/5 blur-3xl rounded-full scale-150 animate-pulse" />
+                            <div className="relative w-44 h-44 rounded-full p-[2px] bg-gradient-to-b from-christmas-gold/60 to-transparent">
+                                <div className="w-full h-full rounded-full overflow-hidden border border-black/50">
+                                    <Image
+                                        src={imageUrl}
+                                        alt={name}
+                                        fill
+                                        className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+                                    />
+                                </div>
                             </div>
-                            <Snowflake className="absolute -top-2 -right-2 text-christmas-gold/40 w-8 h-8 rotate-12" />
                         </div>
                     ) : (
-                        <motion.h2
-                            className="text-7xl font-serif text-christmas-gold text-center tracking-tighter"
-                            animate={{
-                                textShadow: [
-                                    '0 0 15px rgba(255, 215, 0, 0.3)',
-                                    '0 0 25px rgba(255, 215, 0, 0.5)',
-                                    '0 0 15px rgba(255, 215, 0, 0.3)',
-                                ],
-                            }}
-                            transition={{ duration: 3, repeat: Infinity }}
-                        >
-                            {name}
-                        </motion.h2>
+                        <div className="relative">
+                            <h2 className="text-6xl font-serif text-transparent bg-clip-text bg-gradient-to-b from-[#e2c07d] to-[#926339] tracking-tighter italic">
+                                {name}
+                            </h2>
+                            <div className="w-20 h-[1px] bg-christmas-gold/40 mx-auto mt-4" />
+                        </div>
                     )}
                 </motion.div>
 
-                {/* Elegant Poem */}
+                {/* Poem Section: Typographie Royale */}
                 <motion.div
-                    initial={{ y: 30, opacity: 0 }}
+                    initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.7, duration: 0.8 }}
-                    className="w-full max-w-lg"
+                    transition={{ delay: 1.1, duration: 1 }}
+                    className="w-full max-w-md relative"
                 >
-                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 shadow-2xl relative">
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900 px-4">
-                            <Star className="text-christmas-gold w-5 h-5 fill-christmas-gold" />
-                        </div>
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-christmas-gold/20">
+                        <Crown size={24} strokeWidth={1} />
+                    </div>
 
-                        <p className="text-gray-300 text-center whitespace-pre-line leading-relaxed font-serif italic text-lg">
+                    <div className="py-8 border-y border-christmas-gold/10">
+                        <p className="text-gray-400 text-center leading-[2] font-serif italic text-base md:text-lg tracking-wide">
                             "{poem}"
                         </p>
+                    </div>
 
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-gray-900 px-4">
-                            <Star className="text-christmas-gold w-5 h-5 fill-christmas-gold" />
-                        </div>
+                    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-christmas-gold/20">
+                        <Award size={20} strokeWidth={1} />
                     </div>
                 </motion.div>
 
-                {/* Footer Decoration */}
+                {/* Footer: Signature de la collection */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.9, duration: 0.8 }}
-                    className="flex flex-col items-center gap-2"
+                    transition={{ delay: 1.4 }}
+                    className="pt-8 space-y-2"
                 >
-                    <span className="text-christmas-gold/40 text-[10px] tracking-[0.5em] uppercase">Est. 2024</span>
-                    <div className="flex items-center gap-3">
-                        <div className="w-12 h-[0.5px] bg-christmas-gold/30" />
-                        <Zap className="text-christmas-gold w-3 h-3 fill-christmas-gold" />
-                        <div className="w-12 h-[0.5px] bg-christmas-gold/30" />
+                    <p className="text-christmas-gold/50 text-[9px] tracking-[0.6em] uppercase font-bold">
+                        Collection Privée • 2024
+                    </p>
+                    <div className="flex justify-center opacity-30">
+                        <InfinityIcon size={16} className="text-christmas-gold" />
                     </div>
                 </motion.div>
             </div>
+
+            {/* Reflet de lumière diagonal furtif */}
+            <motion.div
+                animate={{ x: ['-100%', '200%'] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "linear", repeatDelay: 3 }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 pointer-events-none"
+            />
         </motion.div>
     );
 }

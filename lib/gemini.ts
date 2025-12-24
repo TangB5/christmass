@@ -1,103 +1,98 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { Language, Gender, GeneratedPoem } from './types';
+import fetch from "node-fetch";
+import { Language, Gender, GeneratedPoem } from "./types";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const API_KEY = process.env.GEMINI_API_KEY!;
 
+// Configuration du retry
+const MAX_RETRIES = 3;
+const INITIAL_DELAY = 2000; // 2 secondes
+
+/**
+ * Fonction utilitaire pour attendre
+ */
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Appelle l’API avec gestion du retry et de l'attente exponentielle
+ */
+async function callGenerateContentWithRetry(prompt: string, retryCount = 0): Promise<string> {
+    // 1. On utilise le nom exact récupéré dans ton "Get Code"
+    const modelName = "gemini-3-flash-preview";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`;
+
+    try {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{
+                    role: "user", // Ajout du rôle comme dans ton exemple Python
+                    parts: [{ text: prompt }]
+                }]
+            }),
+        });
+
+        // 2. Gestion du Quota (429)
+        if (res.status === 429 && retryCount < 3) {
+            const delay = 5000 * (retryCount + 1);
+            console.warn(`Quota Gemini 3 atteint. Réessai dans ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return callGenerateContentWithRetry(prompt, retryCount + 1);
+        }
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Erreur API (${res.status}): ${errorText}`);
+        }
+
+        const data = await res.json() as any;
+
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!content) {
+            throw new Error("L'IA a renvoyé une réponse vide.");
+        }
+
+        return content;
+
+    } catch (error) {
+        // En cas d'échec critique du modèle Preview, on peut forcer un repli sur 1.5
+        if (retryCount >= 2) {
+            console.error("Échec définitif sur Gemini 3, vérifiez votre quota sur Google AI Studio.");
+        }
+        throw error;
+    }
+}
+
+/**
+ * Génère les poèmes (Utilise désormais la fonction avec Retry)
+ */
 export async function generatePoems(
     name: string,
     gender: Gender,
     language: Language
 ): Promise<GeneratedPoem[]> {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-
     const genderText = {
-        boy: language === 'fr' ? 'garçon' : 'boy',
-        girl: language === 'fr' ? 'fille' : 'girl',
-        neutral: language === 'fr' ? 'personne' : 'person'
+        boy: language === "fr" ? "garçon" : "boy",
+        girl: language === "fr" ? "fille" : "girl",
+        neutral: language === "fr" ? "personne" : "person",
     };
 
-    const prompt = language === 'fr'
-        ? `Génère 4 poèmes courts et festifs (4-6 lignes chacun) pour souhaiter un joyeux Noël et une bonne année à ${name}, un(e) ${genderText[gender]}. 
-    
-Chaque poème doit :
-- Être unique et personnalisé avec le nom ${name}
-- Avoir un style différent (classique, moderne, enfantin, élégant)
-- Contenir des vœux de Noël et du Nouvel An
-- Être chaleureux et joyeux
+    // Utilisation d'un prompt optimisé pour réduire la taille de réponse
+    const prompt = `Act as a holiday poet. Generate exactly 4 short poems (4 lines) for ${name} (${genderText[gender]}) in ${language === 'fr' ? 'French' : 'English'}.
+    1. Classic style
+    2. Modern style
+    3. For a child
+    4. Elegant & Luxury
+    Return ONLY a JSON array: [{"template_id": 1, "poem": "..."}, ...]`;
 
-Format de réponse STRICT (JSON uniquement) :
-[
-  {"template_id": 1, "poem": "texte du poème 1"},
-  {"template_id": 2, "poem": "texte du poème 2"},
-  {"template_id": 3, "poem": "texte du poème 3"},
-  {"template_id": 4, "poem": "texte du poème 4"}
-]`
-        : `Generate 4 short festive poems (4-6 lines each) to wish ${name}, a ${genderText[gender]}, a Merry Christmas and Happy New Year.
+    const text = await callGenerateContentWithRetry(prompt);
 
-Each poem should:
-- Be unique and personalized with the name ${name}
-- Have a different style (classic, modern, childlike, elegant)
-- Contain Christmas and New Year wishes
-- Be warm and joyful
+    // Nettoyage de la réponse au cas où l'IA ajoute des balises ```json
+    const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    const jsonMatch = cleanedText.match(/\[[\s\S]*\]/);
 
-STRICT response format (JSON only):
-[
-  {"template_id": 1, "poem": "poem 1 text"},
-  {"template_id": 2, "poem": "poem 2 text"},
-  {"template_id": 3, "poem": "poem 3 text"},
-  {"template_id": 4, "poem": "poem 4 text"}
-]`;
+    if (!jsonMatch) throw new Error("Format JSON invalide reçu de l'IA");
 
-    try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-
-        // Extraire le JSON de la réponse
-        const jsonMatch = text.match(/\[[\s\S]*\]/);
-        if (!jsonMatch) {
-            throw new Error('Invalid response format from Gemini');
-        }
-
-        const poems: GeneratedPoem[] = JSON.parse(jsonMatch[0]);
-        return poems;
-    } catch (error) {
-        console.error('Error generating poems:', error);
-        throw error;
-    }
-}
-
-export async function generateSinglePoem(
-    name: string,
-    gender: Gender,
-    language: Language,
-    templateId: number
-): Promise<string> {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-
-    const genderText = {
-        boy: language === 'fr' ? 'garçon' : 'boy',
-        girl: language === 'fr' ? 'fille' : 'girl',
-        neutral: language === 'fr' ? 'personne' : 'person'
-    };
-
-    const styles = {
-        1: language === 'fr' ? 'classique et traditionnel' : 'classic and traditional',
-        2: language === 'fr' ? 'moderne et joyeux' : 'modern and cheerful',
-        3: language === 'fr' ? 'enfantin et ludique' : 'childlike and playful',
-        4: language === 'fr' ? 'élégant et poétique' : 'elegant and poetic'
-    };
-
-    const prompt = language === 'fr'
-        ? `Génère un poème court et festif (4-6 lignes) de style ${styles[templateId as keyof typeof styles]} pour souhaiter un joyeux Noël et une bonne année à ${name}, un(e) ${genderText[gender]}. Le poème doit être personnalisé avec le nom ${name}, chaleureux et joyeux. Retourne UNIQUEMENT le texte du poème, sans aucun titre ni formatage.`
-        : `Generate a short festive poem (4-6 lines) in ${styles[templateId as keyof typeof styles]} style to wish ${name}, a ${genderText[gender]}, a Merry Christmas and Happy New Year. The poem should be personalized with the name ${name}, warm and joyful. Return ONLY the poem text, without any title or formatting.`;
-
-    try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        return response.text().trim();
-    } catch (error) {
-        console.error('Error generating single poem:', error);
-        throw error;
-    }
+    return JSON.parse(jsonMatch[0]) as GeneratedPoem[];
 }
