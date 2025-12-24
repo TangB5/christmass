@@ -43,6 +43,10 @@ export default function CreatePage() {
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5Mo
+                setError(language === 'fr' ? 'Image trop lourde (max 5Mo)' : 'Image too large (max 5MB)');
+                return;
+            }
             setImage(file);
             const reader = new FileReader();
             reader.onloadend = () => setImagePreview(reader.result as string);
@@ -61,42 +65,57 @@ export default function CreatePage() {
         try {
             let uploadedImageUrl = imageUrl;
 
+            // 1. GESTION DE L'UPLOAD
             if (image) {
                 const formData = new FormData();
                 formData.append('file', image);
                 const uploadRes = await fetch('/api/upload-image', { method: 'POST', body: formData });
-                if (!uploadRes.ok) throw new Error('Upload failed');
+
+                if (!uploadRes.ok) {
+                    // On récupère le message d'erreur du backend (ex: "File too large")
+                    const uploadError = await uploadRes.json();
+                    throw new Error(uploadError.error || 'Upload failed');
+                }
+
                 const uploadData = await uploadRes.json();
                 uploadedImageUrl = uploadData.imageUrl;
                 setImageUrl(uploadedImageUrl);
             }
 
+            // 2. GESTION DE LA GÉNÉRATION
             const res = await fetch('/api/generate-poem', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, gender, language }),
             });
 
-            // SÉCURITÉ : Vérifier si la réponse est OK avant de faire res.json()
             if (!res.ok) {
                 const errorData = await res.json();
-                throw new Error(errorData.error || 'Erreur de génération');
+                // On jette l'erreur spécifique retournée par Gemini (ex: Quota exceeded)
+                throw new Error(errorData.error || 'Gemini error');
             }
 
             const data = await res.json();
-
-            if (!data.poems || data.poems.length === 0) {
-                throw new Error('Aucun poème généré');
-            }
+            if (!data.poems || data.poems.length === 0) throw new Error('No poems');
 
             setPoems(data.poems);
             setStep('preview');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
         } catch (err: any) {
             console.error("Détail de l'erreur:", err);
-            setError(language === 'fr'
-                ? `Désolé, l'IA est surchargée (limite gratuite). Réessayez dans 1 minute.`
-                : `AI is busy (free quota reached). Please try again in 1 minute.`);
+
+            // AFFICHAGE DYNAMIQUE DU MESSAGE
+            if (err.message.includes('File too large')) {
+                setError(language === 'fr' ? 'L’image est trop lourde (max 5Mo).' : 'Image is too heavy (max 5MB).');
+            } else if (err.message.toLowerCase().includes('quota') || err.message.includes('429')) {
+                setError(language === 'fr'
+                    ? 'L’IA est surchargée. Réessayez dans 1 minute.'
+                    : 'AI is busy. Please try again in 1 minute.');
+            } else {
+                // Message par défaut pour les autres erreurs
+                setError(err.message || (language === 'fr' ? 'Erreur technique. Réessayez.' : 'Technical error. Try again.'));
+            }
         } finally {
             setLoading(false);
         }

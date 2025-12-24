@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import {
     TreePine,
     Sparkles,
@@ -94,11 +93,12 @@ export default function CardTemplate1({ name, poem, imageUrl, language }: CardTe
                             {/* Halo lumineux derrière l'image */}
                             <div className="absolute inset-0 bg-christmas-gold/30 blur-2xl rounded-full scale-110 animate-pulse" />
                             <div className="relative w-40 h-40 rounded-full border-[6px] border-christmas-gold shadow-2xl overflow-hidden">
-                                <Image
+                                <img
                                     src={imageUrl}
                                     alt={name}
-                                    fill
-                                    className="object-cover scale-105 group-hover:scale-110 transition-transform duration-700"
+                                    className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700"
+                                    crossOrigin="anonymous"
+                                    loading="lazy"
                                 />
                             </div>
                         </div>

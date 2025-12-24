@@ -11,7 +11,7 @@ const nextConfig = {
     },
     experimental: {
         serverActions: {
-            bodySizeLimit: '5mb',
+            bodySizeLimit: '10mb',
         },
     },
     async headers() {
@@ -20,8 +20,12 @@ const nextConfig = {
                 source: '/(.*)',
                 headers: [
                     {
+                        /** * Correction ERR_BLOCKED_BY_RESPONSE :
+                         * 'credentialless' permet de charger des images tierces (Supabase)
+                         * sans que le navigateur n'exige des headers CORP sur chaque image.
+                         */
                         key: 'Cross-Origin-Embedder-Policy',
-                        value: 'require-corp',
+                        value: 'credentialless',
                     },
                     {
                         key: 'Cross-Origin-Opener-Policy',
