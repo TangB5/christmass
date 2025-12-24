@@ -108,7 +108,7 @@ export default function BatchPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#030712] text-white selection:bg-christmas-green/30">
+        <div className="min-h-screen bg-[#030712] text-white selection:bg-christmas-green/30 mt-20">
             {/* Background Decor */}
             <div className="fixed inset-0 -z-10 overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-christmas-green/10 blur-[120px] rounded-full opacity-50" />

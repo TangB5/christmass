@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import AnimatedSnow from '@/components/AnimatedSnow';
+import Navbar from "@/components/Navbar";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,7 +19,8 @@ export default function RootLayout({
 }) {
     return (
         <html lang="fr">
-        <body className={`${inter.className} bg-gradient-to-br from-blue-50 via-white to-red-50 min-h-screen`}>
+        <body className={`${inter.className} bg-[#030712] min-h-screen`}>
+        <Navbar/>
         <AnimatedSnow />
         {children}
         </body>
