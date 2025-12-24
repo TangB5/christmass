@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import {
     Sparkles,
     TreePine,
@@ -96,7 +95,12 @@ export default function CardTemplate2({ name, poem, imageUrl, language }: CardTe
                         <div className="relative group">
                             <div className="absolute -inset-4 bg-emerald-500/20 blur-2xl rounded-3xl group-hover:bg-emerald-500/40 transition-colors" />
                             <div className="relative w-44 h-44 rounded-3xl overflow-hidden border border-white/20 rotate-3 group-hover:rotate-0 transition-transform duration-500">
-                                <Image src={imageUrl} alt={name} fill className="object-cover" />
+                                <img
+                                    src={imageUrl}
+                                    alt={name}
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                    crossOrigin="anonymous"
+                                />
                             </div>
                         </div>
                     ) : (

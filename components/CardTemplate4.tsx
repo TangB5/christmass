@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import {
     Sparkles,
     Diamond,
@@ -98,11 +97,11 @@ export default function CardTemplate4({ name, poem, imageUrl, language }: CardTe
                             <div className="absolute inset-0 bg-christmas-gold/5 blur-3xl rounded-full scale-150 animate-pulse" />
                             <div className="relative w-44 h-44 rounded-full p-[2px] bg-gradient-to-b from-christmas-gold/60 to-transparent">
                                 <div className="w-full h-full rounded-full overflow-hidden border border-black/50">
-                                    <Image
+                                    <img
                                         src={imageUrl}
                                         alt={name}
-                                        fill
-                                        className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+                                        className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+                                        crossOrigin="anonymous"
                                     />
                                 </div>
                             </div>

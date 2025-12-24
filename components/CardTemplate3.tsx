@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import {
     CandyCane,
     Baby,
@@ -121,7 +120,12 @@ export default function CardTemplate3({ name, poem, imageUrl, language }: CardTe
                         <div className="bg-gradient-to-tr from-yellow-100 to-pink-100 rounded-[1.8rem] p-1">
                             {imageUrl ? (
                                 <div className="relative w-40 h-40 rounded-[1.6rem] overflow-hidden">
-                                    <Image src={imageUrl} alt={name} fill className="object-cover" />
+                                    <img
+                                        src={imageUrl}
+                                        alt={name}
+                                        className="absolute inset-0 w-full h-full object-cover"
+                                        crossOrigin="anonymous"
+                                    />
                                 </div>
                             ) : (
                                 <div className="w-40 h-40 flex items-center justify-center bg-white rounded-[1.6rem]">
