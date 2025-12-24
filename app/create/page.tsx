@@ -154,7 +154,7 @@ export default function CreatePage() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#030712] text-white pb-20 selection:bg-christmas-red/30">
+        <div className="min-h-screen bg-[#030712] text-white pb-20 selection:bg-christmas-red/30 mt-20">
             {/* Background Glows */}
             <div className="fixed inset-0 -z-10 overflow-hidden">
                 <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-christmas-red/10 blur-[120px]" />

@@ -131,7 +131,7 @@ export default function PreviewPage() {
     const shareUrl = generateShareUrl(card.share_token);
 
     return (
-        <div className="min-h-screen bg-[#030712] text-white pb-20 relative overflow-x-hidden">
+        <div className="min-h-screen bg-[#030712] text-white pb-20 relative overflow-x-hidden mt-20">
             {/* Background Glows */}
             <div className="fixed inset-0 -z-10">
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-600/10 blur-[120px]" />
