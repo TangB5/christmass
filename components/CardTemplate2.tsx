@@ -100,6 +100,7 @@ export default function CardTemplate2({ name, poem, imageUrl, language }: CardTe
                                     alt={name}
                                     className="absolute inset-0 w-full h-full object-cover"
                                     crossOrigin="anonymous"
+                                    key={imageUrl}
                                 />
                             </div>
                         </div>
