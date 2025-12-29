@@ -29,7 +29,8 @@ export const eventService = {
         name: string,
         gender: Gender,
         language: Language,
-        eventType: EventType
+        eventType: EventType,
+        user_id: string // Ajout de l'ID utilisateur ici
     }): Promise<GeneratedPoem[]> {
         const res = await fetch('/api/generate-poem', {
             method: 'POST',
@@ -39,6 +40,7 @@ export const eventService = {
                 gender: params.gender,
                 language: params.language,
                 eventType: params.eventType,
+                user_id: params.user_id,
             }),
         });
 

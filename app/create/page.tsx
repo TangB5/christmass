@@ -26,11 +26,12 @@ import { getEventConfig } from '@/lib/events';
 import { Language, Gender, GeneratedPoem, TemplateId, EventType } from '@/lib/types';
 
 import { eventService } from '@/lib/Services/eventService';
+import {useAuth} from "@/lib/auth/AuthContext";
 
 function CreateContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-
+    const { user } = useAuth();
     // UI State
     const [step, setStep] = useState<'form' | 'preview'>('form');
     const [loading, setLoading] = useState(false);
@@ -87,9 +88,17 @@ function CreateContent() {
             setError(language === 'fr' ? 'Le nom est requis' : 'Name is required');
             return;
         }
+
+        // VERIFICATION CRUCIALE : On empêche la génération si l'user n'est pas là
+        if (!user) {
+            setError(language === 'fr'
+                ? 'Vous devez être connecté pour créer une carte'
+                : 'You must be logged in to create a card');
+            return;
+        }
+
         setLoading(true);
         setError('');
-
 
         try {
             let currentImageUrl = imageUrl;
@@ -100,9 +109,13 @@ function CreateContent() {
                 setImageUrl(currentImageUrl);
             }
 
-            // 2. Génération des poèmes
+
             const generatedPoems = await eventService.generatePoems({
-                name, gender, language, eventType
+                name,
+                gender,
+                language,
+                eventType,
+                user_id: user.id
             });
 
             setPoems(generatedPoems);
@@ -115,7 +128,6 @@ function CreateContent() {
             setLoading(false);
         }
     };
-
     const handleSelectTemplate = async (templateId: TemplateId) => {
         setLoading(true);
         try {
