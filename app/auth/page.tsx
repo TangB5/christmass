@@ -50,12 +50,7 @@ function AuthContent() { // On déplace le contenu dans un sous-composant
 
         const fullRedirectUrl = `${origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
 
-        // --- AJOUTEZ LES LOGS ICI ---
-        console.log("--- DIAGNOSTIC AUTH ---");
-        console.log("ORIGIN détectée :", window.location.origin);
-        console.log("URL de redirection envoyée à Supabase :", fullRedirectUrl);
-        console.log("-----------------------");
-        // ----------------------------
+
 
         try {
             await signInWithGoogle(fullRedirectUrl);
@@ -177,7 +172,7 @@ function AuthContent() { // On déplace le contenu dans un sous-composant
                                 placeholder="MOT DE PASSE"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-6 py-5 bg-white/[0.03] border border-white/5 rounded-2xl focus:border-white/20 outline-none transition-all text-sm font-bold placeholder:text-gray-700 uppercase"
+                                className="w-full px-6 py-5 bg-white/[0.03] border text-white  border-white/5 rounded-2xl focus:border-white/20 outline-none transition-all text-sm font-bold placeholder:text-gray-700 uppercase"
                                 required
                             />
                             <button
