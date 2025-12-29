@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { uploadImage } from '@/lib/supabase';
 import { nanoid } from 'nanoid';
+import {uploadImage} from "@/lib/supabaseClient";
 
 export async function POST(request: NextRequest) {
     try {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Vérifier le type de fichier
+
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
             return NextResponse.json(

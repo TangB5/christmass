@@ -146,7 +146,7 @@ export default function CardTemplate4({ name, poem, imageUrl, language }: CardTe
                     className="pt-8 space-y-2"
                 >
                     <p className="text-christmas-gold/50 text-[9px] tracking-[0.6em] uppercase font-bold">
-                        Collection Privée • 2024
+                        Collection Privée • 2026
                     </p>
                     <div className="flex justify-center opacity-30">
                         <InfinityIcon size={16} className="text-christmas-gold" />

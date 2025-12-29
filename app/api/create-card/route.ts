@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
 import { generateShareToken } from '@/lib/utils';
+import {supabaseAdmin} from "@/lib/supabaseAdmin";
 
 export async function POST(request: NextRequest) {
     try {

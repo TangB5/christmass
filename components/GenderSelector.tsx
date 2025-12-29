@@ -59,7 +59,7 @@ export default function GenderSelector({ selected, onChange, language }: GenderS
                         type="button"
                         onClick={() => onChange(gender.value)}
                         className={`
-              relative flex flex-col items-center justify-center gap-2 px-4 py-5 rounded-xl
+              relative flex flex-col items-center justify-center gap-2 rounded-xl
               border-2 transition-all duration-200 font-medium
               ${getColorClasses(gender.color, selected === gender.value)}
             `}

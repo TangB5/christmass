@@ -1,196 +1,360 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import Button from '@/components/ui/Button';
-import Navbar from '@/components/Navbar';
+import { useRouter } from 'next/navigation'; // Corrigé
 import {
-    Sparkles,
-    Users,
-    Share2,
-    Bot,
-    CheckCircle2,
-    ArrowRight,
-    Zap,
-    Stars,
-    Globe,
-    Bell
+    Sparkles, Users, Share2, Bot, CheckCircle2,
+    ArrowRight, Zap, Globe, Bell, Gift, Star, Database,
+    ShieldCheck, Mail, Briefcase
 } from 'lucide-react';
 
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: { staggerChildren: 0.15 }
-    }
-};
+import { EVENTS, getAvailableEvents } from '@/lib/events';
+import { EventType } from '@/lib/types';
+import {useEvent} from "@/app/context/EventContext";
+import {useAuth} from "@/lib/auth/AuthContext";
 
-const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-        y: 0,
-        opacity: 1
-    }
+const AdaptiveButton = ({
+                            children,
+                            onClick,
+                            primaryColor,
+                            variant = 'primary',
+                            className = "",
+                            size = "md"
+                        }: any) => {
+    const isPrimary = variant === 'primary';
+
+    return (
+        <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onClick}
+            style={{
+                backgroundColor: isPrimary ? primaryColor : 'transparent',
+                borderColor: isPrimary ? 'transparent' : `${primaryColor}40`,
+                color: isPrimary ? '#000' : '#fff'
+            }}
+            className={`
+                flex items-center justify-center gap-2 font-black uppercase tracking-tighter transition-all
+                ${size === 'lg' ? 'px-10 py-5 rounded-2xl text-lg' : 'px-6 py-3 rounded-xl text-sm'}
+                ${!isPrimary ? 'border backdrop-blur-md hover:bg-white/5' : 'shadow-2xl shadow-white/10'}
+                ${className}
+            `}
+        >
+            {children}
+        </motion.button>
+    );
 };
 
 export default function HomePage() {
     const router = useRouter();
+    const { user } = useAuth();
     const [showProModal, setShowProModal] = useState(false);
+    const { eventId, setEventId } = useEvent();
+    const availableEvents = useMemo(() => getAvailableEvents(), []);
+    const currentEvent = useMemo(() => EVENTS[eventId], [eventId]);
 
+
+    const handleProtectedAction = (path: string) => {
+        if (!user) {
+
+            router.push('/auth');
+        } else {
+            router.push(path);
+        }
+    };
+    const features = [
+        { icon: <Bot />, label: "Gemini 3 Flash", sub: "IA Ultra-Rapide" },
+        { icon: <Share2 />, label: "Export Multi-Format", sub: "GIF & WhatsApp" },
+        { icon: <Globe />, label: "100% Bilingue", sub: "FR / EN" },
+        { icon: <Zap />, label: "Instantanné", sub: "< 3 secondes" }
+    ];
+
+    let language;
     return (
-        <div className="min-h-screen flex flex-col items-center bg-[#030712] text-white selection:bg-red-500/30 overflow-x-hidden">
-            <div className="fixed inset-0 -z-10">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-christmas-red/20 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-christmas-green/10 rounded-full blur-[120px]" />
-                <div className="absolute inset-0 opacity-[0.15] mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
+        <div className="min-h-screen bg-[#030712] text-white selection:bg-white selection:text-black overflow-x-hidden pt-24">
+
+            {/* Arrière-plan : Halos Lumineux Dynamiques */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <motion.div
+                    key={`bg-1-${eventId
+                    }`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    style={{ backgroundColor: `${currentEvent.colors.primary}15` }}
+                    className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] rounded-full blur-[150px] transition-colors duration-1000"
+                />
+                <motion.div
+                    key={`bg-2-${eventId
+                    }`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    style={{ backgroundColor: `${currentEvent.colors.secondary}10` }}
+                    className="absolute -bottom-[10%] -right-[10%] w-[60%] h-[60%] rounded-full blur-[150px] transition-colors duration-1000"
+                />
             </div>
 
-            <Navbar />
+            <main className="relative z-10 max-w-6xl mx-auto px-6 py-16">
 
-            <main className="max-w-6xl w-full px-4 pt-32 pb-20 relative z-10">
+                {/* Sélecteur d'Événements (Style Onglets Studio avec Icônes Lucide) */}
+                <div className="flex justify-center mb-20">
+                    <div className="inline-flex md:p-1.5 p-0 bg-white/5 border border-white/10 rounded-[2.2rem] backdrop-blur-2xl overflow-x-auto">
+                        {availableEvents.map((event) => {
+                            const Icon = event.icon;
+                            const isActive = eventId === event.id;
+
+                            return (
+                                <button
+                                    key={event.id}
+                                    onClick={() => setEventId(event.id as EventType)}
+                                    className={`
+                                        relative px-6 md:py-3 rounded-[1.8rem] text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3
+                                        ${isActive ? 'text-black' : 'text-gray-500 hover:text-white'}
+                                    `}
+                                >
+                                    {isActive && (
+                                        <motion.div
+                                            layoutId="activeTab"
+                                            className="absolute inset-0 rounded-[1.6rem]"
+                                            style={{ backgroundColor: currentEvent.colors.primary }}
+                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        />
+                                    )}
+                                    <Icon size={26} className="relative z-10 text-4xl" strokeWidth={isActive ? 3 : 2} />
+                                    <span className="relative z-10">{event.name.fr}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
                 {/* Hero Section */}
-                <motion.section
-                    initial="hidden" animate="visible" variants={containerVariants}
-                    className="text-center mb-32"
-                >
-                    <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-christmas-gold text-xs font-bold mb-8 backdrop-blur-md">
-                        <Stars size={14} className="animate-spin-slow" />
-                        L'IA RÉINVENTE VOS MESSAGES DE FÊTES
-                    </motion.div>
-
-                    <motion.h1 variants={itemVariants} className="text-6xl md:text-8xl font-black mb-8 tracking-tighter leading-[0.85]">
-                        Illuminez vos <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-christmas-red via-red-400 to-christmas-gold animate-gradient-x">
-                            vœux de Noël
-                        </span>
-                    </motion.h1>
-
-                    <motion.p variants={itemVariants} className="text-lg md:text-2xl text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed font-light">
-                        Créez des cartes animées uniques avec l'IA. <br className="hidden md:block" />
-                        Une expérience immersive pour ceux qui comptent vraiment.
-                    </motion.p>
-
-                    <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-6">
-                        <Button
-                            onClick={() => router.push('/create')}
-                            size="lg"
-                            className="h-16 px-10 rounded-2xl text-lg font-bold shadow-[0_0_30px_rgba(220,38,38,0.4)] bg-christmas-red hover:bg-red-700 transition-all duration-300"
-                        >
-                            Créer ma carte <ArrowRight className="ml-2 w-5 h-5" />
-                        </Button>
-                    </motion.div>
-                </motion.section>
-
-                {/* Features Bento Grid */}
-                <div className="grid md:grid-cols-2 gap-8 mb-32">
-                    {/* Carte Famille */}
-                    <motion.div whileHover={{ y: -10 }} className="group relative bg-gradient-to-b from-white/10 to-transparent backdrop-blur-2xl rounded-[3rem] p-12 border border-white/10 overflow-hidden">
-                        <div className="absolute -right-20 -top-20 w-64 h-64 bg-christmas-red/10 rounded-full blur-[80px] group-hover:bg-christmas-red/20 transition-colors" />
-                        <div className="relative z-10">
-                            <div className="w-16 h-16 bg-red-500/20 text-christmas-red rounded-2xl flex items-center justify-center mb-10 border border-red-500/20 shadow-[0_0_15px_rgba(220,38,38,0.2)]">
-                                <Sparkles className="w-8 h-8" />
-                            </div>
-                            <h2 className="text-4xl font-bold mb-4 italic font-serif">Pour la Famille</h2>
-                            <p className="text-gray-400 text-lg mb-10">Transformez vos souvenirs en poésie. IA adaptée à vos relations.</p>
-                            <div className="grid grid-cols-1 gap-4 mb-10">
-                                {["Thèmes féériques", "Poèmes personnalisés", "Lien de partage unique"].map((item, i) => (
-                                    <div key={i} className="flex items-center gap-3 text-gray-300">
-                                        <CheckCircle2 className="w-5 h-5 text-christmas-red" />
-                                        <span>{item}</span>
-                                    </div>
-                                ))}
-                            </div>
-                            <Button onClick={() => router.push('/create')} className="w-full h-14 rounded-xl text-black font-bold  hover:bg-gray-200">Lancer le Studio</Button>
-                        </div>
-                    </motion.div>
-
-                    {/* Carte Business (UPCOMING) */}
+                <div className="text-center mb-32">
                     <motion.div
-                        whileHover={{ y: -5 }}
-                        className="group relative bg-white/5 backdrop-blur-2xl rounded-[3rem] p-12 border border-white/5 overflow-hidden opacity-80"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        key={eventId
+                        }
+                        className="space-y-8"
                     >
-                        {/* Badge */}
-                        <div className="absolute top-8 right-8 z-20">
-                            <span className="bg-christmas-gold/10 text-christmas-gold text-[10px] font-black px-4 py-1.5 rounded-full border border-christmas-gold/20 tracking-widest uppercase">
-                                Bientôt disponible
-                            </span>
+                        <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-white/10 bg-white/5 text-[10px] font-black tracking-[0.3em] uppercase text-gray-400">
+                            <Sparkles size={14} style={{ color: currentEvent.colors.accent }} />
+                            Expérience Studio 2025
                         </div>
 
-                        <div className="relative z-10">
-                            <div className="w-16 h-16 bg-white/5 text-gray-500 rounded-2xl flex items-center justify-center mb-10 border border-white/10">
-                                <Users className="w-8 h-8" />
-                            </div>
-                            <h2 className="text-4xl font-bold mb-4 text-gray-300 italic font-serif">Pour le Business</h2>
-                            <p className="text-gray-500 text-lg mb-10">Automatisez vos vœux d'entreprise avec votre logo et branding.</p>
-
-                            <div className="grid grid-cols-1 gap-4 mb-10">
-                                {["Export GIF haute qualité", "Branding Entreprise", "Support prioritaire"].map((item, i) => (
-                                    <div key={i} className="flex items-center gap-3 text-gray-600 italic">
-                                        <CheckCircle2 className="w-5 h-5 text-gray-800" />
-                                        <span>{item}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <Button
-                                onClick={() => setShowProModal(true)}
-                                variant="outline"
-                                className="w-full h-14 rounded-xl border-white/10 text-gray-500 hover:bg-white/5"
+                        <h1 className="text-7xl md:text-9xl font-black tracking-[-0.06em] leading-[0.85]">
+                            L'IA POUR VOS <br />
+                            <span
+                                style={{ color: currentEvent.colors.primary }}
+                                className="italic font-serif transition-colors duration-500"
                             >
-                                En savoir plus
-                            </Button>
+                                {currentEvent.name.fr.toUpperCase()}
+                            </span>
+                        </h1>
+
+                        <p className="max-w-2xl mx-auto text-gray-500 text-lg md:text-xl font-medium leading-relaxed">
+                            Oubliez les messages génériques. Créez des cartes animées haute couture
+                            avec des poèmes générés sur mesure par l'IA Gemini 3 Flash.
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
+                            <AdaptiveButton
+                                size="lg"
+                                primaryColor={currentEvent.colors.primary}
+                                onClick={() => handleProtectedAction(`/create?event=${eventId}`)}
+                            >
+                                {user ? "Lancer le Studio" : "Se connecter pour créer"}
+                                <ArrowRight size={20} />
+                            </AdaptiveButton>
+
+                            <AdaptiveButton
+                                size="lg"
+                                variant="outline"
+                                primaryColor={currentEvent.colors.primary}
+                                onClick={() => setShowProModal(true)}
+                            >
+                                Explorer les modèles
+                            </AdaptiveButton>
                         </div>
                     </motion.div>
                 </div>
 
-                {/* Stats */}
-                <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="grid grid-cols-2 md:grid-cols-4 gap-12 py-12 border-y border-white/5">
-                    {[
-                        { icon: Bot, label: "IA Gemini 3", sub: "Flash Preview" },
-                        { icon: Share2, label: "Instantané", sub: "WhatsApp, GIF" },
-                        { icon: Globe, label: "Multilingue", sub: "Traduction auto" },
-                        { icon: Zap, label: "Rapide", sub: "< 10 secondes" }
-                    ].map((f, i) => (
-                        <div key={i} className="flex flex-col items-center text-center">
-                            <f.icon className="w-8 h-8 text-christmas-gold mb-4 opacity-80" />
-                            <h3 className="text-white font-bold text-sm uppercase tracking-widest">{f.label}</h3>
-                            <p className="text-gray-500 text-xs mt-1">{f.sub}</p>
+                {/* Bento Grid Features */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-32">
+                    {features.map((f, i) => (
+                        <div
+                            key={i}
+                            className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group"
+                        >
+                            <div
+                                className="w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-transform group-hover:scale-110 group-hover:rotate-3 shadow-lg shadow-black/20"
+                                style={{ backgroundColor: `${currentEvent.colors.primary}10`, color: currentEvent.colors.primary }}
+                            >
+                                <currentEvent.icon size={28} strokeWidth={1.5} />
+                            </div>
+
+                            <h4 className="font-black text-xl mb-2 tracking-tighter">{f.label}</h4>
+                            <p className="text-gray-500 text-sm font-medium leading-snug">{f.sub}</p>
                         </div>
                     ))}
-                </motion.div>
+                </div>
+
+                {/* Section Packs */}
+                <div className="grid md:grid-cols-2 gap-8 mb-20">
+                    {/* Pack Particulier */}
+                    <div className="relative p-1 rounded-[3rem] bg-gradient-to-b from-white/10 to-transparent">
+                        <div className="bg-[#0b0f1a] rounded-[2.9rem] p-12 h-full flex flex-col justify-between">
+                            <div>
+                                <div className="flex justify-between items-start mb-10">
+                                    <div className="p-5 rounded-2xl bg-white/5 border border-white/10 shadow-inner">
+                                        <Users className="text-white" size={28} />
+                                    </div>
+                                    <span className="px-5 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                                        Libre accès
+                                    </span>
+                                </div>
+                                <h3 className="text-4xl font-black mb-6 tracking-tighter italic font-serif text-white">
+                                    Pack Solo
+                                </h3>
+                                <ul className="space-y-5 mb-12 text-gray-400 font-medium">
+                                    <li className="flex gap-4 items-center"><CheckCircle2 size={20} className="text-gray-700" /> Poèmes IA illimités</li>
+                                    <li className="flex gap-4 items-center"><CheckCircle2 size={20} className="text-gray-700" /> Export HD sans filigrane</li>
+                                    <li className="flex gap-4 items-center"><CheckCircle2 size={20} className="text-gray-700" /> Thèmes artistiques exclusifs</li>
+                                </ul>
+                            </div>
+                            <AdaptiveButton
+                                onClick={() => handleProtectedAction(`/create?event=${eventId}`)}
+                                primaryColor={currentEvent.colors.primary}
+                                className="w-full h-16 rounded-2xl"
+                            >
+                                Commencer maintenant
+                            </AdaptiveButton>
+
+                        </div>
+                    </div>
+
+                    {/* Pack Business */}
+                    <div className="relative p-1 rounded-[3rem] border-2 border-white/10 bg-gradient-to-b from-white/[0.05] to-transparent transition-all duration-500 hover:border-white/20 group">
+                        <div className="bg-transparent rounded-[2.9rem] p-10 h-full flex flex-col justify-between">
+                            <div>
+                                {/* Header avec Badge Statut */}
+                                <div className="flex justify-between items-start mb-8">
+                                    <div
+                                        className="p-5 rounded-2xl bg-white/5 border border-white/10 transition-transform group-hover:scale-110 duration-500"
+                                        style={{ color: currentEvent.colors.primary }}
+                                    >
+                                        <Briefcase size={28} />
+                                    </div>
+                                    <span
+                                        style={{
+                                            backgroundColor: `${currentEvent.colors.primary}15`,
+                                            color: currentEvent.colors.primary,
+                                            borderColor: `${currentEvent.colors.primary}30`
+                                        }}
+                                        className="px-5 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-[0_0_15px_rgba(0,0,0,0.2)]"
+                                    >
+                    Disponible
+                </span>
+                                </div>
+
+                                {/* Titre et Description */}
+                                <h3 className="text-4xl font-black mb-4 tracking-tighter italic font-serif text-white">
+                                    Pack Business
+                                </h3>
+                                <p className="text-gray-400 font-medium text-base leading-relaxed mb-8">
+                                    Optimisez vos relations clients avec une personnalisation de masse intelligente.
+                                </p>
+
+                                {/* Caractéristiques (Caractéristiques ajoutées ici) */}
+                                <div className="space-y-4 mb-10">
+                                    {[
+                                        { icon: <Database size={16} />, fr: "Import Excel / CSV", en: "Excel / CSV Import" },
+                                        { icon: <Zap size={16} />, fr: "Génération par lots (Bulk)", en: "Bulk Generation" },
+                                        { icon: <Mail size={16} />, fr: "Envoi direct par Email", en: "Direct Email Send" },
+                                        { icon: <ShieldCheck size={16} />, fr: "Logo d'entreprise inclus", en: "Company Logo included" }
+                                    ].map((feature, i) => (
+                                        <div key={i} className="flex items-center gap-3 group/item">
+                                            <div className="text-gray-500 group-hover/item:text-white transition-colors">
+                                                {feature.icon}
+                                            </div>
+                                            <span className="text-sm font-bold text-gray-500 group-hover/item:text-gray-300 transition-colors">
+                            {language === 'fr' ? feature.fr : feature.en}
+                        </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Bouton d'action mis à jour */}
+                            <div className="relative overflow-hidden rounded-2xl">
+                                <AdaptiveButton
+                                    onClick={() => handleProtectedAction(`/batch?event=${eventId}`)}
+                                    primaryColor={currentEvent.colors.primary}
+                                    variant="solid"
+                                    className="w-full h-16 rounded-2xl font-black uppercase tracking-widest text-xs"
+                                >
+                                    <Zap size={18} className="mr-2" />
+                                    {language === 'fr' ? 'Lancer un Batch' : 'Start Batch'}
+                                </AdaptiveButton>
+                            </div>
+                        </div>
+
+                        <div className="absolute inset-0 rounded-[3rem] bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                    </div>
+                </div>
             </main>
 
-            {/* MODALE INTERNE POUR LE PACK PRO */}
+            {/* Footer */}
+            <footer className="relative z-10 py-16 border-t border-white/5 text-center">
+                <div className="flex justify-center items-center gap-6 mb-8 text-gray-600">
+                    <button className="hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest">Confidentialité</button>
+                    <div className="w-1 h-1 rounded-full bg-gray-800" />
+                    <button className="hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest">Mentions Légales</button>
+                </div>
+                <p className="text-gray-700 text-[10px] font-black uppercase tracking-[0.6em]">
+                    © 2025 VŒUX MAGIQUES • L'ART DE DIRE MERCI
+                </p>
+            </footer>
+
+            {/* Modal Business Adaptative */}
             <AnimatePresence>
                 {showProModal && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
                         <motion.div
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             onClick={() => setShowProModal(false)}
-                            className="absolute inset-0 bg-black/90 backdrop-blur-xl"
+                            className="absolute inset-0 bg-black/90 backdrop-blur-3xl"
                         />
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-                            className="relative w-full max-w-md bg-black border border-white/10 p-10 rounded-[3rem] text-center"
+                            initial={{ scale: 0.9, y: 20, opacity: 0 }}
+                            animate={{ scale: 1, y: 0, opacity: 1 }}
+                            exit={{ scale: 0.9, y: 20, opacity: 0 }}
+                            className="relative bg-[#0b0f1a] border border-white/10 p-12 rounded-[3.5rem] max-w-lg w-full text-center overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)]"
                         >
-                            <Bell className="w-16 h-16 text-christmas-gold mx-auto mb-6 animate-bounce" />
-                            <h3 className="text-3xl font-black mb-4">Offre Business</h3>
-                            <p className="text-gray-400 mb-8">
-                                Nous finalisons les outils de personnalisation pour les entreprises.
-                                Ouverture prévue pour le 31 janvier 2025.
-                            </p>
-                            <Button onClick={() => setShowProModal(false)} className="w-full h-14 rounded-2xl  text-black font-bold">
-                                J'ai compris
-                            </Button>
+                            <div
+                                className="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[80px] opacity-20"
+                                style={{ backgroundColor: currentEvent.colors.primary }}
+                            />
+
+                            <div className="relative z-10">
+                                <div
+                                    style={{ backgroundColor: `${currentEvent.colors.primary}10`, borderColor: `${currentEvent.colors.primary}20` }}
+                                    className="w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-8 border shadow-xl"
+                                >
+                                    <Gift style={{ color: currentEvent.colors.primary }} size={48} className="animate-bounce" />
+                                </div>
+                                <h3 className="text-4xl font-black mb-4 italic font-serif">Arrivée Imminente</h3>
+                                <p className="text-gray-400 mb-10 leading-relaxed font-medium">
+                                    Le module de personnalisation de masse pour les entreprises est en phase finale de test.
+                                </p>
+                                <AdaptiveButton primaryColor={currentEvent.colors.primary} className="w-full h-16 rounded-2xl text-lg">
+                                    Rejoindre la liste VIP
+                                </AdaptiveButton>
+                            </div>
                         </motion.div>
                     </div>
                 )}
             </AnimatePresence>
-
-            <footer className="w-full max-w-6xl px-6 py-12 text-center opacity-40">
-                <p className="text-sm">© 2025 Vœux Magiques • L'IA au service du cœur</p>
-            </footer>
         </div>
     );
 }

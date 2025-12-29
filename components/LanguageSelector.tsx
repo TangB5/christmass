@@ -26,7 +26,7 @@ export default function LanguageSelector({ selected, onChange }: LanguageSelecto
                         type="button"
                         onClick={() => onChange(lang.value)}
                         className={`
-              relative flex items-center justify-center gap-3 px-6 py-4 rounded-xl
+              relative flex items-center justify-center gap-3 p-5 rounded-xl
               border-2 transition-all duration-200 font-medium
               ${selected === lang.value
                             ? 'border-christmas-red bg-red-50 text-christmas-red shadow-md'
@@ -34,10 +34,10 @@ export default function LanguageSelector({ selected, onChange }: LanguageSelecto
                         }
             `}
                     >
-                        <span className="text-3xl">{lang.flag}</span>
+                        <span className="text-xl">{lang.flag}</span>
                         <span className="text-lg">{lang.label}</span>
                         {selected === lang.value && (
-                            <div className="absolute top-2 right-2">
+                            <div className="absolute top-0 right-0">
                                 <svg
                                     className="w-5 h-5 text-christmas-red"
                                     fill="currentColor"

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, {useEffect, useState, useRef, useMemo} from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toPng } from 'html-to-image';
@@ -15,13 +15,14 @@ import CardTemplate3 from '@/components/CardTemplate3';
 import CardTemplate4 from '@/components/CardTemplate4';
 
 // Utils & Icons
-import { CardData } from '@/lib/types';
+import {CardData, EventType, TemplateId} from '@/lib/types';
 import { generateShareUrl } from '@/lib/utils';
 import {
     ArrowLeft, Download, Share2, Info, User, Layout,
     Lightbulb, PlusCircle, Loader2, AlertCircle,
     Printer, Film, Share, Sparkles
 } from 'lucide-react';
+import {getTemplateComponent} from "@/components/TemplateRoutes";
 
 export default function PreviewPage() {
     const params = useParams();
@@ -34,6 +35,17 @@ export default function PreviewPage() {
     const [error, setError] = useState('');
     const [isExporting, setIsExporting] = useState(false);
     const [exportProgress, setExportProgress] = useState(0);
+
+    const displayPoem = useMemo(() => {
+        if (!card) return "";
+
+
+        if (typeof card.poem === 'object' && card.poem !== null) {
+            return (card.poem as any).poem || "";
+        }
+
+        return card.poem as string;
+    }, [card]);
 
     useEffect(() => {
         const fetchCard = async () => {
@@ -126,9 +138,13 @@ export default function PreviewPage() {
         );
     }
 
-    const templates = { 1: CardTemplate1, 2: CardTemplate2, 3: CardTemplate3, 4: CardTemplate4 };
-    const TemplateComponent = templates[card.template_id as keyof typeof templates];
     const shareUrl = generateShareUrl(card.share_token);
+
+
+    const TemplateComponent = getTemplateComponent(
+        card.event_type as EventType,
+        card.template_id as TemplateId
+    );
 
     return (
         <div className="min-h-screen bg-[#030712] text-white pb-20 relative overflow-x-hidden mt-20">
@@ -203,9 +219,10 @@ export default function PreviewPage() {
                                 <div className="rounded-[2.6rem] overflow-hidden bg-[#050505]">
                                     <TemplateComponent
                                         name={card.name}
-                                        poem={card.poem}
+                                        poem={displayPoem}
                                         imageUrl={card.image_url || undefined}
                                         language={card.language}
+                                        isBusiness={!!card.business_name}
                                     />
                                 </div>
                                 <div className="absolute -top-4 -right-4 bg-christmas-gold text-black px-5 py-2 rounded-full font-black text-[10px] shadow-2xl rotate-12 uppercase tracking-widest border-2 border-white">

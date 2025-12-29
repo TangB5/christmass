@@ -1,22 +1,61 @@
 import fetch from "node-fetch";
-import {Language, Gender, GeneratedPoem, TemplateId} from "./types";
+import { Language, Gender, GeneratedPoem, TemplateId, EventType } from "./types";
+import { getEventConfig } from './events';
 
 const API_KEY = process.env.GEMINI_API_KEY!;
-
-// Configuration du retry
 const MAX_RETRIES = 3;
-const INITIAL_DELAY = 2000; // 2 secondes
 
 /**
- * Fonction utilitaire pour attendre
+ * Dictionnaire de contextes pour les différents événements
  */
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const getEventContext = (eventType: EventType, language: Language) => {
 
+
+    const contexts: Record<string, Record<Language, string>> = {
+        christmas: {
+            fr: 'Noël et une bonne année',
+            en: 'Merry Christmas and Happy New Year',
+        },
+        newyear: {
+            fr: 'une excellente nouvelle année pleine de bonheur et de réussite',
+            en: 'a wonderful new year full of happiness and success',
+        },
+        valentine: {
+            fr: 'une joyeuse Saint-Valentin avec tout mon amour',
+            en: "a happy Valentine's Day with all my love",
+        },
+        easter: {
+            fr: 'de joyeuses Pâques pleines de renouveau et de joie',
+            en: 'a happy Easter full of renewal and joy',
+        },
+        birthday: {
+            fr: 'un joyeux anniversaire rempli de bonheur',
+            en: 'a happy birthday filled with joy',
+        },
+        mothersday: {
+            fr: 'une merveilleuse fête des mères',
+            en: "a wonderful Mother's Day",
+        },
+        fathersday: {
+            fr: 'une superbe fête des pères',
+            en: "a great Father's Day",
+        },
+    };
+
+    // On vérifie si la clé existe
+    const event = contexts[eventType];
+
+    if (!event) {
+        console.error(`⚠️ L'événement "${eventType}" n'est pas reconnu. Retour à Noël.`);
+        return contexts['christmas'][language];
+    }
+
+    return event[language] || event['fr'];
+};
 /**
- * Appelle l’API avec gestion du retry et de l'attente exponentielle
+ * Appelle l’API Gemini avec gestion du retry et Quota (429)
  */
 async function callGenerateContentWithRetry(prompt: string, retryCount = 0): Promise<string> {
-    // 1. On utilise le nom exact récupéré dans ton "Get Code"
     const modelName = "gemini-3-flash-preview";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`;
 
@@ -26,16 +65,15 @@ async function callGenerateContentWithRetry(prompt: string, retryCount = 0): Pro
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 contents: [{
-                    role: "user", // Ajout du rôle comme dans ton exemple Python
+                    role: "user",
                     parts: [{ text: prompt }]
                 }]
             }),
         });
 
-        // 2. Gestion du Quota (429)
-        if (res.status === 429 && retryCount < 3) {
+        if (res.status === 429 && retryCount < MAX_RETRIES) {
             const delay = 5000 * (retryCount + 1);
-            console.warn(`Quota Gemini 3 atteint. Réessai dans ${delay}ms...`);
+            console.warn(`Quota Gemini atteint. Réessai ${retryCount + 1}/${MAX_RETRIES} dans ${delay}ms...`);
             await new Promise(resolve => setTimeout(resolve, delay));
             return callGenerateContentWithRetry(prompt, retryCount + 1);
         }
@@ -46,49 +84,73 @@ async function callGenerateContentWithRetry(prompt: string, retryCount = 0): Pro
         }
 
         const data = await res.json() as any;
-
         const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-        if (!content) {
-            throw new Error("L'IA a renvoyé une réponse vide.");
-        }
-
+        if (!content) throw new Error("L'IA a renvoyé une réponse vide.");
         return content;
 
     } catch (error) {
-        // En cas d'échec critique du modèle Preview, on peut forcer un repli sur 1.5
-        if (retryCount >= 2) {
-            console.error("Échec définitif sur Gemini 3, vérifiez votre quota sur Google AI Studio.");
+        if (retryCount >= MAX_RETRIES - 1) {
+            console.error("Échec définitif sur Gemini après retries.");
         }
         throw error;
     }
 }
 
 /**
- * Génère les poèmes (Utilise désormais la fonction avec Retry)
+ * Génère 4 poèmes pour un événement spécifique
  */
 export async function generatePoems(
     name: string,
     gender: Gender,
-    language: Language
+    language: Language,
+    eventType: EventType
 ): Promise<GeneratedPoem[]> {
-    const genderText = {
-        boy: language === "fr" ? "garçon" : "boy",
-        girl: language === "fr" ? "fille" : "girl",
-        neutral: language === "fr" ? "personne" : "person",
+
+    const eventConfig = getEventConfig(eventType);
+
+
+    const eventContext = getEventContext(eventType, language);
+    const genderLabels: any = {
+        fr: {
+            boy: "garçon", girl: "fille",
+            man: "homme", woman: "femme",
+            male: "homme", female: "femme",
+            neutral: "personne"
+        },
+        en: {
+            boy: "boy", girl: "girl",
+            man: "man", woman: "woman",
+            male: "man", female: "woman",
+            neutral: "person"
+        }
     };
 
-    // Utilisation d'un prompt optimisé pour réduire la taille de réponse
-    const prompt = `Act as a holiday poet. Generate exactly 4 short poems (4 lines) for ${name} (${genderText[gender]}) in ${language === 'fr' ? 'French' : 'English'}.
-    1. Classic style
-    2. Modern style
-    3. For a child
+    const label = genderLabels[language][gender] || genderLabels[language]['neutral'];
+
+    // 3. Extraction sécurisée du nom du thème (Fallbacks si undefined)
+    const themeName = eventConfig?.name
+        ? (language === 'fr' ? eventConfig.name.fr : eventConfig.name.en)
+        : (language === 'fr' ? 'Fête' : 'Celebration');
+
+    const prompt = `Act as a professional poet. Generate 4 short festive poems (4 lines each) to wish ${eventContext} to ${name} (${label}) in ${language === 'fr' ? 'French' : 'English'}.
+    Theme: ${themeName}.
+    
+    Styles required:
+    1. Classic & Traditional
+    2. Modern & Cheerful
+    3. Childlike & Playful
     4. Elegant & Luxury
-    Return ONLY a JSON array: [{"template_id": 1, "poem": "..."}, ...]`;
+    
+    Requirements:
+    - Each poem must include the name: ${name}
+    - Unique and warm tone
+    - Return ONLY a JSON array of objects.
+    
+    Format: [{"template_id": 1, "poem": "..."}, {"template_id": 2, "poem": "..."}, {"template_id": 3, "poem": "..."}, {"template_id": 4, "poem": "..."}]`;
 
     const text = await callGenerateContentWithRetry(prompt);
 
-    // Nettoyage de la réponse au cas où l'IA ajoute des balises ```json
     const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
     const jsonMatch = cleanedText.match(/\[[\s\S]*\]/);
 
@@ -98,28 +160,52 @@ export async function generatePoems(
 }
 
 /**
- * Génère un seul poème en utilisant generatePoems
- *//**
- * Génère un seul poème, optionnellement selon un template spécifique
+ * Génère un seul poème selon un template précis ou par défaut
  */
 export async function generateSinglePoem(
-    name: string,
+    companyName: string,
     gender: Gender,
     language: Language,
-    templateId?: TemplateId // argument optionnel
+    eventType: EventType,
+    templateId: TemplateId = 1
 ): Promise<GeneratedPoem> {
-    // Génère tous les poèmes
-    const poems = await generatePoems(name, gender, language);
 
-    // Si un templateId est fourni, on cherche le poème correspondant
-    if (templateId !== undefined) {
-        const poem = poems.find(p => p.template_id === templateId);
-        if (!poem) {
-            throw new Error(`Template ${templateId} non trouvé dans les poèmes générés`);
-        }
-        return poem;
+    const eventContext = getEventContext(eventType, language);
+
+    const prompt = `Act as a professional corporate communications expert. 
+    Generate a formal and elegant greeting (6 short lines) in ${language === 'fr' ? 'French' : 'English'}.
+    
+    IMPORTANT: Use the placeholder "[[NAME]]" to represent the recipient's name within the poem.
+    The message is sent on behalf of the company: ${companyName}.
+    
+    Context: Wishing ${eventContext}.
+    Tone: Professional, formal, "Vouvoiement" (if French), business-appropriate.
+    
+    Requirements:
+    - The poem MUST include "[[NAME]]" (e.g., "Cher(e) [[NAME]]" or "À l'attention de [[NAME]]").
+    - Mention that these wishes come from ${companyName}.
+    - Express professional gratitude and best wishes for the event.
+    - Return ONLY a JSON object.
+    
+    Format: {"template_id": ${templateId}, "poem": "..."}`;
+
+    try {
+        const text = await callGenerateContentWithRetry(prompt);
+
+        const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
+        const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
+
+        if (!jsonMatch) throw new Error("Format JSON invalide");
+
+        return JSON.parse(jsonMatch[0]) as GeneratedPoem;
+    } catch (error) {
+        console.error("Erreur dans generateSinglePoem Business:", error);
+        // Fallback avec le marqueur pour ne pas casser la boucle de remplacement
+        return {
+            template_id: templateId,
+            poem: language === 'fr'
+                ? `Cher(e) [[NAME]], toute l'équipe de ${companyName} vous souhaite ${eventContext} et une pleine réussite.`
+                : `Dear [[NAME]], the ${companyName} team wishes you a ${eventContext} and great success.`
+        };
     }
-
-    // Sinon, retourne simplement le premier poème
-    return poems[0];
 }
