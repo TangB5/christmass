@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,Suspense} from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -27,7 +27,7 @@ import { Language, Gender, GeneratedPoem, TemplateId, EventType } from '@/lib/ty
 
 import { eventService } from '@/lib/Services/eventService';
 
-export default function CreatePage() {
+function CreateContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -410,5 +410,20 @@ export default function CreatePage() {
                 </AnimatePresence>
             </div>
         </div>
+    );
+}
+
+export default function CreatePage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#030712] flex flex-col items-center justify-center gap-4">
+                <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+                <p className="text-gray-500 font-black uppercase tracking-[0.3em] text-xs">
+                    Initialisation du Studio...
+                </p>
+            </div>
+        }>
+            <CreateContent />
+        </Suspense>
     );
 }

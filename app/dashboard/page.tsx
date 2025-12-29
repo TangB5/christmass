@@ -1,6 +1,6 @@
 'use client';
 
-import {useState, useEffect, useMemo, useRef} from 'react';
+import {useState, useEffect, useMemo, useRef,Suspense} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutGrid, List, Plus, Search, Trash2, Send, Eye,
@@ -23,7 +23,7 @@ import {useEvent} from "@/app/context/EventContext";
 
 const eventLabels = EVENT_LABELS;
 
-export default function DashboardPage() {
+function DashboardContent() {
     const searchParams = useSearchParams();
     const { eventId, setEventId } = useEvent();
     const currentEvent = useMemo(() => EVENTS[eventId], [eventId]);
@@ -466,5 +466,20 @@ function DeleteModal({ count, onConfirm, onCancel }: { count: number, onConfirm:
                 </div>
             </motion.div>
         </div>
+    );
+}
+
+export default function DashboardPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#030712] flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-10 h-10 border-2 border-white/10 border-t-white rounded-full animate-spin" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Chargement du panel...</p>
+                </div>
+            </div>
+        }>
+            <DashboardContent />
+        </Suspense>
     );
 }

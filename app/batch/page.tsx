@@ -1,13 +1,13 @@
 
 'use client';
 
-import React, {useState, useMemo, useRef} from 'react';
+import React, {useState, useMemo, useRef,Suspense} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    UploadCloud, Users, Mail, MessageCircle,
-    FileImage, Zap, ExternalLink, Trash2,
+    UploadCloud, Users,
+    FileImage, Zap,
     Image, Briefcase, CheckCircle2, Send, Eye,
-    ChevronRight, Download, X, Plus, Check, Loader2
+     Download, X, Plus, Check, Loader2
 } from 'lucide-react';
 
 import { useEventTemplates } from '@/components/TemplateRoutes';
@@ -20,7 +20,9 @@ import {useAuth} from "@/lib/auth/AuthContext";
 import { toPng } from 'html-to-image';
 import JSZip from 'jszip';
 
-export default function BatchPage() {
+function BatchContent() {
+
+
     const searchParams = useSearchParams();
 
     const eventId = (searchParams.get('event') as EventType) || 'newyear';
@@ -886,5 +888,19 @@ export default function BatchPage() {
                 }
             `}</style>
         </div>
+    );
+}
+
+export default function BatchPage() {
+    return (
+
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#030712] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-purple-500"></div>
+                chargement...
+            </div>
+        }>
+            <BatchContent />
+        </Suspense>
     );
 }

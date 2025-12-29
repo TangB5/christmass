@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, PartyPopper, Star } from 'lucide-react';
+import { Sparkles, Star, Trophy, PartyPopper } from 'lucide-react';
 
 interface CardTemplate3Props {
     name: string;
@@ -12,155 +12,131 @@ interface CardTemplate3Props {
 }
 
 export default function CardTemplate3NewYear({ name, poem, imageUrl, language }: CardTemplate3Props) {
-    const title = language === 'fr' ? 'Bonne Année !' : 'Happy New Year!';
+    const title = language === 'fr' ? 'Bonne Année' : 'Happy New Year';
+    const year = "2026";
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative w-full aspect-[3/4] bg-gradient-to-br from-yellow-300 via-orange-400 to-purple-500 rounded-2xl overflow-hidden shadow-2xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="relative w-full aspect-[3/4] bg-[#020617] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10"
         >
-            {/* Cercles Colorés Amusants */}
-            <motion.div
-                className="absolute w-40 h-40 bg-yellow-400 rounded-full opacity-30"
-                style={{ top: '10%', left: '5%' }}
-                animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
-                transition={{ duration: 5, repeat: Infinity }}
-            />
-            <motion.div
-                className="absolute w-32 h-32 bg-pink-400 rounded-full opacity-30"
-                style={{ top: '50%', right: '10%' }}
-                animate={{ scale: [1, 1.4, 1], rotate: [360, 180, 0] }}
-                transition={{ duration: 6, repeat: Infinity }}
-            />
-            <motion.div
-                className="absolute w-28 h-28 bg-blue-400 rounded-full opacity-30"
-                style={{ bottom: '15%', left: '20%' }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 4, repeat: Infinity }}
-            />
+            {/* Effets de lumière en arrière-plan */}
+            <div className="absolute inset-0 overflow-hidden">
+                <motion.div
+                    animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [0.3, 0.5, 0.3]
+                    }}
+                    transition={{ duration: 8, repeat: Infinity }}
+                    className="absolute -top-[10%] -left-[10%] w-[70%] h-[70%] bg-amber-500/20 blur-[100px] rounded-full"
+                />
+                <motion.div
+                    animate={{
+                        scale: [1.2, 1, 1.2],
+                        opacity: [0.2, 0.4, 0.2]
+                    }}
+                    transition={{ duration: 10, repeat: Infinity }}
+                    className="absolute -bottom-[10%] -right-[10%] w-[70%] h-[70%] bg-purple-600/20 blur-[100px] rounded-full"
+                />
+            </div>
 
-            {/* Emojis Festifs Bondissants */}
-            <div className="absolute inset-0">
-                {['🎉', '🎊', '✨', '🌟', '💫', '🎆'].map((emoji, i) => (
+            {/* Particules de Confettis Dorés (Subtils) */}
+            <div className="absolute inset-0 pointer-events-none">
+                {[...Array(20)].map((_, i) => (
                     <motion.div
                         key={i}
-                        className="absolute text-5xl"
+                        className="absolute w-1 h-1 bg-amber-400 rounded-full"
                         style={{
-                            left: `${15 + i * 15}%`,
-                            top: `${20 + (i % 2) * 40}%`,
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
                         }}
                         animate={{
-                            y: [0, -25, 0],
-                            rotate: [0, 15, -15, 0],
-                            scale: [1, 1.2, 1],
+                            y: [0, 20, 0],
+                            opacity: [0, 1, 0],
+                            scale: [0, 1, 0]
                         }}
                         transition={{
-                            duration: 2 + i * 0.3,
+                            duration: 3 + Math.random() * 2,
                             repeat: Infinity,
-                            delay: i * 0.2,
+                            delay: Math.random() * 5
                         }}
-                    >
-                        {emoji}
-                    </motion.div>
+                    />
                 ))}
             </div>
 
-            {/* Contenu */}
-            <div className="relative h-full flex flex-col items-center justify-between p-6 z-10">
-                {/* Header Fun */}
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: 'spring', bounce: 0.6 }}
-                    className="text-center"
-                >
+            {/* Contenu Principal */}
+            <div className="relative h-full flex flex-col items-center justify-between p-8 z-10">
+
+                {/* Header Élégant */}
+                <div className="text-center mt-4">
+                    <motion.div
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4"
+                    >
+                        <Star size={12} fill="currentColor" />
+                        Grand Cru {year}
+                        <Star size={12} fill="currentColor" />
+                    </motion.div>
+
                     <motion.h1
-                        className="text-6xl font-black text-white mb-2"
-                        style={{
-                            textShadow: '5px 5px 0px rgba(0,0,0,0.3)',
-                        }}
-                        animate={{ rotate: [-3, 3, -3] }}
-                        transition={{ duration: 0.6, repeat: Infinity }}
+                        className="text-5xl md:text-6xl font-black italic text-white leading-none tracking-tighter uppercase"
+                        style={{ textShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
                     >
-                        {title}
+                        {title.split(' ')[0]} <br/>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-b from-amber-200 via-amber-500 to-amber-700">
+                            {title.split(' ')[1]}
+                        </span>
                     </motion.h1>
-                    <div className="flex justify-center gap-2 text-5xl">
-                        <motion.span animate={{ rotate: [0, 360] }} transition={{ duration: 3, repeat: Infinity }}>
-                            🎆
-                        </motion.span>
-                        <motion.span animate={{ scale: [1, 1.4, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                            ⭐
-                        </motion.span>
-                        <motion.span animate={{ rotate: [360, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                            🎆
-                        </motion.span>
-                    </div>
-                </motion.div>
+                </div>
 
-                {/* Image/Nom avec Cadre Fun */}
+                {/* Photo de profil type "Badge Studio" */}
                 <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.4, type: 'spring' }}
-                    className="relative"
+                    whileHover={{ scale: 1.05, rotate: 0 }}
+                    className="relative w-40 h-40 group"
                 >
-                    <div className="bg-white rounded-3xl p-2 shadow-2xl transform rotate-3">
-                        <div className="bg-gradient-to-br from-yellow-200 to-orange-200 rounded-2xl p-1">
-                            {imageUrl ? (
-                                <div className="relative w-36 h-36 rounded-2xl overflow-hidden">
-                                    <img
-                                        src={imageUrl}
-                                        alt={name}
-                                        className="w-full h-full object-cover"
-                                        crossOrigin="anonymous"
-                                        loading="lazy"
-                                    />
-                                </div>
-                            ) : (
-                                <div className="w-36 h-36 flex items-center justify-center bg-white rounded-2xl">
-                                    <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-orange-500 to-pink-500">
-                                        {name}
-                                    </h2>
-                                </div>
-                            )}
-                        </div>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-amber-500 to-amber-200 rounded-[2.5rem] rotate-6 group-hover:rotate-0 transition-transform duration-500 shadow-xl" />
+                    <div className="absolute inset-0.5 bg-[#020617] rounded-[2.4rem] rotate-6 group-hover:rotate-0 transition-transform duration-500 overflow-hidden">
+                        {imageUrl ? (
+                            <img src={imageUrl} className="w-full h-full object-cover" alt={name} />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-white/5">
+                                <span className="text-5xl font-black text-amber-500">{name[0]}</span>
+                            </div>
+                        )}
                     </div>
-                    {/* Stickers Décoratifs */}
-                    <motion.div
-                        className="absolute -top-4 -right-4 text-5xl"
-                        animate={{ rotate: [0, 20, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                        🎉
-                    </motion.div>
-                    <motion.div
-                        className="absolute -bottom-4 -left-4 text-5xl"
-                        animate={{ rotate: [0, -20, 0] }}
-                        transition={{ duration: 1.8, repeat: Infinity }}
-                    >
-                        💫
-                    </motion.div>
+
+                    {/* Badge Nom */}
+                    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white px-4 py-1.5 rounded-xl shadow-2xl">
+                        <span className="text-black text-xs font-black uppercase tracking-widest whitespace-nowrap">
+                            {name}
+                        </span>
+                    </div>
                 </motion.div>
 
-                {/* Boîte de Poème Ludique */}
+                {/* Boîte de texte Minimaliste */}
                 <motion.div
-                    initial={{ y: 50, opacity: 0 }}
+                    initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="bg-white rounded-3xl p-5 shadow-2xl border-4 border-yellow-400 max-w-md"
+                    className="w-full bg-white/[0.03] border border-white/10 backdrop-blur-md rounded-[2rem] p-6 mb-2"
                 >
-                    <div className="text-center mb-2 text-3xl">
-                        ✨ 🎆 ✨
+                    <div className="flex justify-center gap-1 mb-4">
+                        {[...Array(3)].map((_, i) => (
+                            <Sparkles key={i} size={14} className="text-amber-500/50" />
+                        ))}
                     </div>
-                    <p className="text-gray-800 text-center whitespace-pre-line leading-relaxed font-bold text-lg">
-                        {poem}
+                    <p className="text-gray-200 text-center italic font-serif text-lg leading-relaxed px-2">
+                        "{poem}"
                     </p>
-                    <div className="text-center mt-2 text-3xl">
-                        🌟 💫 🌟
+                    <div className="mt-4 flex justify-center">
+                        <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
                     </div>
                 </motion.div>
+
+                <div className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-600">
+                    Sende Studio • {year}
+                </div>
             </div>
         </motion.div>
     );
