@@ -1,49 +1,77 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import Input from '@/components/ui/Input';
+import {
+    ArrowLeft,
+    Calendar,
+    Check,
+    CheckCircle2,
+    Eye,
+    ImageIcon,
+    Languages,
+    Sparkles,
+    Upload,
+    User,
+    Wand2,
+    X
+} from "lucide-react";
+
 import Button from '@/components/ui/Button';
 import LanguageSelector from '@/components/LanguageSelector';
 import GenderSelector from '@/components/GenderSelector';
-import CardTemplate1 from '@/components/CardTemplate1';
-import CardTemplate2 from '@/components/CardTemplate2';
-import CardTemplate3 from '@/components/CardTemplate3';
-import CardTemplate4 from '@/components/CardTemplate4';
-import { Language, Gender, GeneratedPoem, TemplateId } from '@/lib/types';
-import {
-    ArrowLeft,
-    Upload,
-    Wand2,
-    Sparkles,
-    Check,
-    X,
-    Image as ImageIcon,
-    User,
-    Languages,
-    Eye,
-    Palette
-} from 'lucide-react';
+import { useEventTemplates } from '@/components/TemplateRoutes';
+import { getEventConfig } from '@/lib/events';
+import { Language, Gender, GeneratedPoem, TemplateId, EventType } from '@/lib/types';
+
+import { eventService } from '@/lib/Services/eventService';
 
 export default function CreatePage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // UI State
     const [step, setStep] = useState<'form' | 'preview'>('form');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    // Form State
     const [name, setName] = useState('');
     const [language, setLanguage] = useState<Language>('fr');
     const [gender, setGender] = useState<Gender>('neutral');
+    const [eventType, setEventType] = useState<EventType>('christmas');
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string>('');
     const [poems, setPoems] = useState<GeneratedPoem[]>([]);
     const [imageUrl, setImageUrl] = useState<string>('');
 
+    useEffect(() => {
+        const event = searchParams.get('event') as EventType;
+        if (event) {
+            setEventType(event);
+        }
+    }, [searchParams]);
+
+    useEffect(() => {
+        if (eventType === 'mothersday') {
+            setGender('girl');
+        } else if (eventType === 'fathersday') {
+            setGender('boy');
+        } else {
+            setGender('neutral');
+        }
+    }, [eventType]);
+
+
+    const templates = useEventTemplates(eventType, language);
+    const eventConfig = getEventConfig(eventType);
+    const Icon = eventConfig.icon;
+
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            if (file.size > 5 * 1024 * 1024) { // 5Mo
+            if (file.size > 5 * 1024 * 1024) {
                 setError(language === 'fr' ? 'Image trop lourde (max 5Mo)' : 'Image too large (max 5MB)');
                 return;
             }
@@ -62,82 +90,43 @@ export default function CreatePage() {
         setLoading(true);
         setError('');
 
+
         try {
-            let uploadedImageUrl = imageUrl;
+            let currentImageUrl = imageUrl;
 
-            // 1. GESTION DE L'UPLOAD
+            // 1. Upload image si présente
             if (image) {
-                const formData = new FormData();
-                formData.append('file', image);
-                const uploadRes = await fetch('/api/upload-image', { method: 'POST', body: formData });
-
-                if (!uploadRes.ok) {
-                    // On récupère le message d'erreur du backend (ex: "File too large")
-                    const uploadError = await uploadRes.json();
-                    throw new Error(uploadError.error || 'Upload failed');
-                }
-
-                const uploadData = await uploadRes.json();
-                uploadedImageUrl = uploadData.imageUrl;
-                setImageUrl(uploadedImageUrl);
+                currentImageUrl = await eventService.uploadImage(image);
+                setImageUrl(currentImageUrl);
             }
 
-            // 2. GESTION DE LA GÉNÉRATION
-            const res = await fetch('/api/generate-poem', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, gender, language }),
+            // 2. Génération des poèmes
+            const generatedPoems = await eventService.generatePoems({
+                name, gender, language, eventType
             });
 
-            if (!res.ok) {
-                const errorData = await res.json();
-                // On jette l'erreur spécifique retournée par Gemini (ex: Quota exceeded)
-                throw new Error(errorData.error || 'Gemini error');
-            }
-
-            const data = await res.json();
-            if (!data.poems || data.poems.length === 0) throw new Error('No poems');
-
-            setPoems(data.poems);
+            setPoems(generatedPoems);
             setStep('preview');
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
         } catch (err: any) {
-            console.error("Détail de l'erreur:", err);
-
-            // AFFICHAGE DYNAMIQUE DU MESSAGE
-            if (err.message.includes('File too large')) {
-                setError(language === 'fr' ? 'L’image est trop lourde (max 5Mo).' : 'Image is too heavy (max 5MB).');
-            } else if (err.message.toLowerCase().includes('quota') || err.message.includes('429')) {
-                setError(language === 'fr'
-                    ? 'L’IA est surchargée. Réessayez dans 1 minute.'
-                    : 'AI is busy. Please try again in 1 minute.');
-            } else {
-                // Message par défaut pour les autres erreurs
-                setError(err.message || (language === 'fr' ? 'Erreur technique. Réessayez.' : 'Technical error. Try again.'));
-            }
+            handleError(err);
         } finally {
             setLoading(false);
         }
     };
+
     const handleSelectTemplate = async (templateId: TemplateId) => {
         setLoading(true);
         try {
             const selectedPoem = poems.find(p => p.template_id === templateId);
             if (!selectedPoem) return;
 
-            const res = await fetch('/api/create-card', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name, gender, language,
-                    template_id: templateId,
-                    poem: selectedPoem.poem,
-                    image_url: imageUrl || null,
-                }),
+            const data = await eventService.createCard({
+                name, gender, language, eventType,
+                templateId, poem: selectedPoem.poem, imageUrl
             });
 
-            const data = await res.json();
             router.push(`/preview/${data.card.share_token}`);
         } catch (err) {
             setError('Erreur de création');
@@ -146,25 +135,38 @@ export default function CreatePage() {
         }
     };
 
-    const templates = [
-        { id: 1 as TemplateId, Component: CardTemplate1, label: language === 'fr' ? 'Classique' : 'Classic' },
-        { id: 2 as TemplateId, Component: CardTemplate2, label: language === 'fr' ? 'Moderne' : 'Modern' },
-        { id: 3 as TemplateId, Component: CardTemplate3, label: language === 'fr' ? 'Enfantin' : 'Playful' },
-        { id: 4 as TemplateId, Component: CardTemplate4, label: language === 'fr' ? 'Élégant' : 'Elegant' },
-    ];
-
+    const handleError = (err: any) => {
+        console.error("Erreur:", err);
+        if (err.message.includes('429')) {
+            setError(language === 'fr' ? "L'IA est surchargée. Réessayez dans 1 min." : "AI busy. Try again in 1 min.");
+        } else {
+            setError(err.message);
+        }
+    };
     return (
         <div className="min-h-screen bg-[#030712] text-white pb-20 selection:bg-christmas-red/30 mt-20">
-            {/* Background Glows */}
+            {/* Background Glows - ⭐ ADAPTÉS AUX COULEURS DE L'ÉVÉNEMENT */}
             <div className="fixed inset-0 -z-10 overflow-hidden">
-                <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-christmas-red/10 blur-[120px]" />
-                <div className="absolute bottom-0 left-0 w-[30%] h-[30%] bg-christmas-green/5 blur-[120px]" />
+                <div
+                    className="absolute top-0 right-0 w-[40%] h-[40%] blur-[120px]"
+                    style={{
+                        backgroundColor: `${eventConfig.colors.primary}10`
+                    }}
+                />
+                <div
+                    className="absolute bottom-0 left-0 w-[30%] h-[30%] blur-[120px]"
+                    style={{
+                        backgroundColor: `${eventConfig.colors.secondary}05`
+                    }}
+                />
             </div>
 
-            {/* Barre de progression */}
             <div className="fixed top-0 left-0 w-full h-1.5 bg-white/5 z-50">
                 <motion.div
-                    className="h-full bg-gradient-to-r from-christmas-red to-christmas-gold shadow-[0_0_10px_rgba(220,38,38,0.5)]"
+                    className="h-full shadow-lg"
+                    style={{
+                        background: `linear-gradient(to right, ${eventConfig.colors.primary}, ${eventConfig.colors.accent})`
+                    }}
                     animate={{ width: step === 'form' ? '40%' : '100%' }}
                 />
             </div>
@@ -181,10 +183,19 @@ export default function CreatePage() {
                         {language === 'fr' ? 'Retour' : 'Back'}
                     </Button>
 
-                    <div className="flex items-center gap-4 bg-white/5 px-4 py-2 rounded-2xl border border-white/10">
-                        <Palette size={18} className="text-christmas-gold" />
-                        <span className="text-xs font-bold tracking-[0.2em] uppercase text-gray-400">
-                            {step === 'form' ? 'Configuration' : 'Personnalisation'}
+                    {/* ⭐ AFFICHAGE DE L'ÉVÉNEMENT SÉLECTIONNÉ */}
+                    <div
+                        className="flex items-center gap-3 px-5 py-3 rounded-2xl border"
+                        style={{
+                            backgroundColor: `${eventConfig.colors.primary}10`,
+                            borderColor: `${eventConfig.colors.primary}30`,
+                        }}
+                    >
+                        <span className="text-2xl">
+  <Icon />
+     </span>
+                        <span className="text-sm font-bold">
+                            {eventConfig.name[language]}
                         </span>
                     </div>
                 </header>
@@ -202,13 +213,18 @@ export default function CreatePage() {
                             <div className="lg:col-span-5 space-y-8">
                                 <h1 className="text-5xl md:text-6xl font-black leading-tight tracking-tighter">
                                     Créez un <br />
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-christmas-red to-christmas-gold">
+                                    <span
+                                        className="text-transparent bg-clip-text"
+                                        style={{
+                                            backgroundImage: `linear-gradient(to right, ${eventConfig.colors.primary}, ${eventConfig.colors.accent})`
+                                        }}
+                                    >
                                         instant magique
                                     </span>
                                 </h1>
 
                                 <p className="text-gray-400 text-lg font-light leading-relaxed">
-                                    Laissez notre IA rédiger un poème unique. Ajoutez une photo pour rendre ce moment inoubliable.
+                                    {eventConfig.description[language]}
                                 </p>
 
                                 {/* Photo Polaroid Preview */}
@@ -239,6 +255,8 @@ export default function CreatePage() {
                             {/* Form Column */}
                             <div className="lg:col-span-7 bg-white/5 backdrop-blur-xl rounded-[3rem] p-8 md:p-12 border border-white/10 shadow-2xl">
                                 <div className="space-y-10">
+
+
                                     {/* Selecteurs avec Icones */}
                                     <div className="grid md:grid-cols-2 gap-8">
                                         <div className="space-y-3">
@@ -251,7 +269,21 @@ export default function CreatePage() {
                                             <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest px-1">
                                                 <User size={14} /> Destinataire
                                             </label>
-                                            <GenderSelector selected={gender} onChange={setGender} language={language} />
+                                            {/* SI fête des mères ou pères, on affiche juste un badge informatif, sinon le sélecteur */}
+                                            {eventType === 'mothersday' || eventType === 'fathersday' ? (
+                                                <div
+                                                    className="w-full h-14 flex items-center px-6 rounded-2xl border border-white/10 bg-white/5 font-bold text-sm uppercase tracking-widest"
+                                                    style={{ color: eventConfig.colors.primary }}
+                                                >
+                                                    <CheckCircle2 size={16} className="mr-2" />
+                                                    {eventType === 'mothersday'
+                                                        ? (language === 'fr' ? 'POUR ELLE' : 'FOR HER')
+                                                        : (language === 'fr' ? 'POUR LUI' : 'FOR HIM')
+                                                    }
+                                                </div>
+                                            ) : (
+                                                <GenderSelector selected={gender} onChange={setGender} language={language} />
+                                            )}
                                         </div>
                                     </div>
 
@@ -264,7 +296,10 @@ export default function CreatePage() {
                                             placeholder="Ex: Marie, Thomas..."
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
-                                            className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-xl focus:outline-none focus:border-christmas-red focus:ring-1 focus:ring-christmas-red transition-all"
+                                            className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-xl focus:outline-none transition-all"
+                                            style={{
+                                                borderColor: `${eventConfig.colors.primary}30`,
+                                            }}
                                         />
                                     </div>
 
@@ -275,7 +310,7 @@ export default function CreatePage() {
                                         </label>
                                         <label className="flex flex-col items-center justify-center w-full h-32 bg-black/20 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-white/5 hover:border-white/20 transition-all group">
                                             <div className="flex flex-col items-center justify-center">
-                                                <Upload className="w-8 h-8 text-gray-500 group-hover:text-christmas-gold transition-colors mb-2" />
+                                                <Upload className="w-8 h-8 text-gray-500 transition-colors mb-2" style={{ color: `${eventConfig.colors.accent}` }} />
                                                 <p className="text-sm text-gray-500">Glissez ou cliquez pour uploader</p>
                                             </div>
                                             <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
@@ -291,7 +326,11 @@ export default function CreatePage() {
                                     <Button
                                         onClick={handleGenerate}
                                         isLoading={loading}
-                                        className="w-full h-16 rounded-2xl bg-christmas-red hover:bg-red-600 text-white font-bold text-xl shadow-[0_0_20px_rgba(220,38,38,0.3)]"
+                                        className="w-full h-16 rounded-2xl text-white font-bold text-xl"
+                                        style={{
+                                            backgroundColor: eventConfig.colors.primary,
+                                            boxShadow: `0 0 20px ${eventConfig.colors.primary}30`,
+                                        }}
                                     >
                                         <Wand2 className="mr-3" />
                                         {language === 'fr' ? 'Générer le poème' : 'Generate Poem'}
@@ -307,7 +346,13 @@ export default function CreatePage() {
                             className="space-y-12"
                         >
                             <div className="text-center space-y-4">
-                                <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 text-green-500 rounded-full mb-4 border border-green-500/20 shadow-[0_0_20px_rgba(34,197,94,0.2)]">
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 border shadow-lg"
+                                     style={{
+                                         backgroundColor: `${eventConfig.colors.primary}20`,
+                                         color: eventConfig.colors.primary,
+                                         borderColor: `${eventConfig.colors.primary}20`,
+                                     }}
+                                >
                                     <Check size={32} />
                                 </div>
                                 <h2 className="text-4xl font-bold">Votre poème est prêt !</h2>
@@ -315,6 +360,7 @@ export default function CreatePage() {
                             </div>
 
                             <div className="grid md:grid-cols-2 gap-10">
+                                {/* ⭐ UTILISATION DES TEMPLATES DYNAMIQUES */}
                                 {templates.map((template) => {
                                     const poemData = poems.find(p => p.template_id === template.id);
                                     if (!poemData) return null;
@@ -323,16 +369,20 @@ export default function CreatePage() {
                                         <motion.div
                                             key={template.id}
                                             whileHover={{ y: -10 }}
-                                            className="group relative bg-white/5 border border-white/10 p-6 rounded-[2rem] hover:border-christmas-gold/50 transition-all duration-500"
+                                            className="group relative bg-white/5 border border-white/10 p-6 rounded-[2rem] hover:border-white/30 transition-all duration-500"
                                         >
                                             <div className="flex justify-between items-center mb-6">
-                                                <span className="text-xs font-black uppercase tracking-widest text-christmas-gold">
+                                                <span
+                                                    className="text-xs font-black uppercase tracking-widest"
+                                                    style={{ color: eventConfig.colors.accent }}
+                                                >
                                                     Style {template.label}
                                                 </span>
                                                 <Eye className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors" />
                                             </div>
 
                                             <div className="rounded-2xl overflow-hidden shadow-2xl bg-black">
+                                                {/* ⭐ RENDU DU BON COMPOSANT */}
                                                 <template.Component
                                                     name={name}
                                                     poem={poemData.poem}
@@ -344,7 +394,10 @@ export default function CreatePage() {
                                             <Button
                                                 onClick={() => handleSelectTemplate(template.id)}
                                                 isLoading={loading}
-                                                className="w-full mt-8 h-14 rounded-xl  text-black font-bold hover:bg-gray-200"
+                                                className="w-full mt-8 h-14 rounded-xl text-white font-bold"
+                                                style={{
+                                                    backgroundColor: eventConfig.colors.primary,
+                                                }}
                                             >
                                                 Choisir ce style
                                             </Button>

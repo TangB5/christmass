@@ -1,17 +1,14 @@
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Client pour le frontend
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const supabaseAdmin = createClient(
-    supabaseUrl,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
 
-// Fonction pour uploader une image
+/**
+ * Upload une image dans le storage Supabase
+ */
 export async function uploadImage(file: File, fileName: string) {
     try {
         const { data, error } = await supabase.storage
@@ -23,7 +20,6 @@ export async function uploadImage(file: File, fileName: string) {
 
         if (error) throw error;
 
-        // Obtenir l'URL publique
         const { data: { publicUrl } } = supabase.storage
             .from('card-images')
             .getPublicUrl(data.path);
@@ -35,7 +31,9 @@ export async function uploadImage(file: File, fileName: string) {
     }
 }
 
-// Fonction pour supprimer une image
+/**
+ * Supprime une image du storage
+ */
 export async function deleteImage(filePath: string) {
     try {
         const { error } = await supabase.storage

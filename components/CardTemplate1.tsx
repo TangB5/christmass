@@ -148,7 +148,7 @@ export default function CardTemplate1({ name, poem, imageUrl, language }: CardTe
                     </div>
 
                     <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-christmas-gold/80">
-                        Édition Magique 2024
+                        Édition Magique 2026
                     </span>
                 </motion.div>
             </div>
