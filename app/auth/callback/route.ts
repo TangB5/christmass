@@ -5,7 +5,6 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url)
     const code = searchParams.get('code')
-    // Permet de rediriger l'utilisateur là où il voulait aller, sinon vers le dashboard
     const next = searchParams.get('next') ?? '/dashboard'
 
     if (code) {

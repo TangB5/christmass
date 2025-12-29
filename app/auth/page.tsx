@@ -41,15 +41,21 @@ function AuthContent() { // On déplace le contenu dans un sous-composant
     };
 
     const handleGoogleSignIn = async () => {
+
+        const origin = window.location.origin;
+
+
         const nextPath = searchParams.get('next') || '/dashboard';
-        const fullRedirectUrl = `${window.location.origin}${nextPath}`;
+
+
+        const fullRedirectUrl = `${origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+
         try {
             await signInWithGoogle(fullRedirectUrl);
         } catch (err) {
             console.error("Erreur Google Auth:", err);
         }
     };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
