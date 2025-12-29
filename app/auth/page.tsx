@@ -50,6 +50,13 @@ function AuthContent() { // On déplace le contenu dans un sous-composant
 
         const fullRedirectUrl = `${origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
 
+        // --- AJOUTEZ LES LOGS ICI ---
+        console.log("--- DIAGNOSTIC AUTH ---");
+        console.log("ORIGIN détectée :", window.location.origin);
+        console.log("URL de redirection envoyée à Supabase :", fullRedirectUrl);
+        console.log("-----------------------");
+        // ----------------------------
+
         try {
             await signInWithGoogle(fullRedirectUrl);
         } catch (err) {
