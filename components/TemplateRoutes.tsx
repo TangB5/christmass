@@ -108,7 +108,21 @@ export function getTemplateComponent(
     eventType: EventType,
     templateId: TemplateId
 ): TemplateComponent {
-    return TEMPLATE_MAP[eventType][templateId];
+    const eventTemplates = TEMPLATE_MAP[eventType];
+
+    if (!eventTemplates) {
+        console.error(`L'événement "${eventType}" n'existe pas dans TEMPLATE_MAP`);
+        return TEMPLATE_MAP.christmas[1];
+    }
+
+    const Component = eventTemplates[templateId];
+
+    if (!Component) {
+        console.error(`Le template ID "${templateId}" n'existe pas pour ${eventType}`);
+        return eventTemplates[1];
+    }
+
+    return Component;
 }
 
 /**

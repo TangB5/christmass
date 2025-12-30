@@ -9,10 +9,6 @@ import { imagesToGif } from '@/lib/ffmpeg';
 // Components
 import Button from '@/components/ui/Button';
 import ShareButtons from '@/components/ShareButtons';
-import CardTemplate1 from '@/components/CardTemplate1';
-import CardTemplate2 from '@/components/CardTemplate2';
-import CardTemplate3 from '@/components/CardTemplate3';
-import CardTemplate4 from '@/components/CardTemplate4';
 
 // Utils & Icons
 import {CardData, EventType, TemplateId} from '@/lib/types';
@@ -50,9 +46,13 @@ export default function PreviewPage() {
     useEffect(() => {
         const fetchCard = async () => {
             try {
-                const res = await fetch(`/api/create-card?token=${params.id}`);
+                const res = await fetch(`/api/create-card?token=${params.id}`,{
+                    cache: 'no-store',
+                });
                 if (!res.ok) throw new Error('Card not found');
                 const data = await res.json();
+
+
                 setCard(data.card);
             } catch (err) {
                 setError('Card not found');
@@ -70,10 +70,8 @@ export default function PreviewPage() {
             setIsExporting(true);
             setExportProgress(0);
 
-
-            // 1️⃣ Capturer les frames du DOM
             const images: string[] = [];
-            const frameCount = 15; // nombre de frames pour le GIF
+            const frameCount = 15;
 
             for (let i = 0; i < frameCount; i++) {
                 const dataUrl = await toPng(cardRef.current, {
@@ -84,17 +82,17 @@ export default function PreviewPage() {
                 images.push(dataUrl);
 
                 setExportProgress(Math.round(((i + 1) / frameCount) * 100));
-                await new Promise(resolve => setTimeout(resolve, 100)); // petite pause pour animation
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
 
-            // 2️⃣ Convertir les frames en GIF avec FFmpeg
+
             const blob = await imagesToGif(images, 400, 533, 6);
 
-            // 3️⃣ Télécharger le GIF
+
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `noel-${card?.name || 'card'}.gif`;
+            a.download = `${card?.event_type || 'event'}-${card?.name || 'card'}.gif`;
             a.click();
             URL.revokeObjectURL(url);
 
@@ -108,9 +106,13 @@ export default function PreviewPage() {
     };
 
     const handleWhatsAppShare = () => {
+        const eventName = card?.event_type === 'christmas' ? 'Noël' :
+            card?.event_type === 'birthday' ? 'Anniversaire' : 'Fête';
+
         const text = card?.language === 'fr'
-            ? `Regarde la carte de Noël magique que j'ai créée pour ${card.name} ! ✨`
-            : `Look at the magic Christmas card I created for ${card?.name}! ✨`;
+            ? `Regarde la carte de ${eventName} magique que j'ai créée pour ${card.name} ! ✨`
+            : `Look at the magic ${card?.event_type} card I created for ${card?.name}! ✨`;
+
         const url = encodeURIComponent(generateShareUrl(card?.share_token || ''));
         window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
     };

@@ -30,7 +30,6 @@ export async function batchGenerateCards(
 
 
 
-    console.log('📤 [SERVICE] Envoi du batch pour UserID:', params.userId || 'Anonyme');
 
     const response = await fetch('/api/batch-generate', {
         method: 'POST',

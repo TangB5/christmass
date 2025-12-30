@@ -5,41 +5,22 @@ import {supabaseAdmin} from "@/lib/supabaseAdmin";
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { name, gender, language, template_id, poem, image_url } = body;
+        // 1. AJOUT de event_type ici
+        const { name, gender, language, template_id, poem, image_url, event_type, user_id } = body;
 
-        // Validation
-        if (!name || !gender || !language || !template_id || !poem) {
+        // 2. Validation (ajoute event_type aux champs requis)
+        if (!name || !gender || !language || !template_id || !poem || !event_type) {
             return NextResponse.json(
-                { error: 'Missing required fields' },
+                { error: 'Missing required fields (including event_type)' },
                 { status: 400 }
             );
         }
 
-        if (!['fr', 'en'].includes(language)) {
-            return NextResponse.json(
-                { error: 'Invalid language' },
-                { status: 400 }
-            );
-        }
+        // ... (tes autres validations) ...
 
-        if (!['boy', 'girl', 'neutral'].includes(gender)) {
-            return NextResponse.json(
-                { error: 'Invalid gender' },
-                { status: 400 }
-            );
-        }
-
-        if (![1, 2, 3, 4].includes(template_id)) {
-            return NextResponse.json(
-                { error: 'Invalid template_id' },
-                { status: 400 }
-            );
-        }
-
-        // Générer un token unique pour le partage
         const shareToken = generateShareToken();
 
-        // Insérer dans la base de données
+        // 3. Insertion complète
         const { data, error } = await supabaseAdmin
             .from('cards')
             .insert({
@@ -48,18 +29,17 @@ export async function POST(request: NextRequest) {
                 language,
                 template_id,
                 poem,
+                event_type,
                 image_url: image_url || null,
                 share_token: shareToken,
+                user_id: user_id || null
             })
             .select()
             .single();
 
         if (error) {
             console.error('Supabase error:', error);
-            return NextResponse.json(
-                { error: 'Failed to create card' },
-                { status: 500 }
-            );
+            return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
         return NextResponse.json({ card: data });
