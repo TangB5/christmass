@@ -4,7 +4,6 @@ import { Language, Gender, EventType } from '@/lib/types';
 import { createClient } from '@supabase/supabase-js'; // Import de Supabase
 import { v4 as uuidv4 } from 'uuid'
 
-// Initialisation du client Supabase (côté serveur)
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

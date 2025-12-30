@@ -35,15 +35,13 @@ export async function POST(request: NextRequest) {
         // On construit le nom de référence pour Gemini :
         // Si businessName est fourni, on peut faire un mix "[[NAME]] de la part de businessName"
         // ou simplement demander à Gemini d'utiliser le placeholder.
-        const referenceName = businessName ? `${placeholder} (de la part de ${businessName})` : placeholder;
 
-        console.log('🤖 [GEMINI] Génération du template unique avec placeholder...');
 
         let basePoemData: any;
         try {
             basePoemData = await generateSinglePoem(
-                referenceName,
-                'neutral' as Gender, // Neutre pour le template
+                businessName || "notre entreprise",
+                'neutral' as Gender,
                 language as Language,
                 eventType as EventType,
                 template_id as TemplateId
@@ -71,9 +69,7 @@ export async function POST(request: NextRequest) {
 
                 let personalizedPoem = templateText.replace(new RegExp('\\[\\[NAME\\]\\]', 'g'), name);
 
-                // Sécurité : si Gemini a écrit le nom de l'entreprise au lieu du placeholder
                 if (businessName && personalizedPoem.includes(businessName) && !personalizedPoem.includes(name)) {
-                    // On peut choisir de laisser tel quel ou d'ajouter le nom
                 }
 
                 const shareToken = generateShareToken();
