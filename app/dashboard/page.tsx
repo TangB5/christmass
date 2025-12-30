@@ -146,7 +146,7 @@ function DashboardContent() {
     );
 
     const handleShare = async (card: CardData) => {
-        const shareUrl = `${window.location.origin}/card/${card.share_token}`;
+        const shareUrl = `${window.location.origin}/preview/${card.share_token}`;
         if (navigator.share) {
             try {
                 await navigator.share({ title: `Carte ${eventLabels[card.event_type]}`, url: shareUrl });
@@ -393,7 +393,7 @@ function CardGridItem({ card, isSelected, onSelect, onShare }: { card: CardData,
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-4 z-20">
                     <div className="flex gap-3 scale-90 group-hover:scale-100 transition-transform duration-300">
                         <a
-                            href={`/card/${card.share_token}`}
+                            href={`/preview/${card.share_token}`}
                             target="_blank"
                             className="p-4 rounded-2xl bg-white text-black hover:bg-gray-200 transition-colors shadow-xl"
                         >
@@ -444,7 +444,7 @@ function CardListItem({ card, isSelected, onSelect, onShare }: { card: CardData,
                 </div>
             </div>
             <div className="flex items-center gap-2">
-                <a href={`/card/${card.share_token}`} target="_blank" className="p-3 rounded-xl bg-white/5 text-gray-400 hover:text-white"><ExternalLink size={18} /></a>
+                <a href={`/preview/${card.share_token}`} target="_blank" className="p-3 rounded-xl bg-white/5 text-gray-400 hover:text-white"><ExternalLink size={18} /></a>
                 <button onClick={onShare} className="p-3 rounded-xl bg-white/5 text-gray-400 hover:text-white"><Send size={18} /></button>
             </div>
         </motion.div>

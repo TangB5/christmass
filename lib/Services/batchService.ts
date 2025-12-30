@@ -27,10 +27,6 @@ export async function batchGenerateCards(
 ): Promise<BatchGenerationResult[]> {
 
 
-
-
-
-
     const response = await fetch('/api/batch-generate', {
         method: 'POST',
         headers: {
