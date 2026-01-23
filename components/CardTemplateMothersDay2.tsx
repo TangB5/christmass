@@ -2,160 +2,135 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Flower2, Heart, Sparkles } from 'lucide-react';
-import {CardTemplateProps} from "@/lib/types";
+import { Flower2, Heart, Sparkles, Wind } from 'lucide-react';
+import { CardTemplateProps } from "@/lib/types";
 
-
-
-export default function CardTemplate2MothersDay({ name, poem, imageUrl, language,isBusiness = false }: CardTemplateProps) {
+export default function CardTemplate2MothersDay({ name, poem, imageUrl, language, isBusiness = false }: CardTemplateProps) {
     const title = language === 'fr'
         ? (isBusiness ? 'Bonne Fête des Mères' : 'Bonne Fête Maman')
         : 'Happy Mother\'s Day';
 
     return (
         <motion.div
-            initial={{ opacity: 0, rotateY: -90 }}
-            animate={{ opacity: 1, rotateY: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
-            className="relative w-full aspect-[3/4] bg-gradient-to-br from-pink-300 via-pink-500 to-rose-700 rounded-2xl overflow-hidden shadow-2xl"
+            className="relative w-full aspect-[3/4] bg-[#FFF5F7] rounded-[2.5rem] overflow-hidden shadow-2xl border-[12px] border-white"
         >
-            {/* Motif Floral Ondulant */}
-            <div className="absolute inset-0">
-                {[...Array(8)].map((_, i) => (
+            {/* 1. Fond : Dégradé de Pétales Doux */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,#FFEDF0_0%,transparent_50%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#FFCCD5_0%,transparent_50%)] opacity-60" />
+
+            {/* 2. Éléments Décoratifs : Fleurs en Parallaxe */}
+            <div className="absolute inset-0 pointer-events-none">
+                {[...Array(5)].map((_, i) => (
                     <motion.div
                         key={i}
-                        className="absolute"
+                        className="absolute text-rose-200/40"
                         style={{
-                            left: `${i * 12.5}%`,
-                            top: '50%',
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
                         }}
                         animate={{
-                            y: [0, -30, 0],
-                            rotate: [0, 15, -15, 0],
+                            y: [0, -40, 0],
+                            rotate: [0, 45, 0],
+                            scale: [1, 1.2, 1],
                         }}
                         transition={{
-                            duration: 4 + i * 0.5,
+                            duration: 5 + i,
                             repeat: Infinity,
-                            ease: 'easeInOut',
+                            ease: "easeInOut"
                         }}
                     >
-                        <Flower2 className="text-pink-200/30" size={40} />
+                        <Flower2 size={60 + i * 20} strokeWidth={0.5} />
                     </motion.div>
                 ))}
             </div>
 
-            {/* Papillons Gracieux */}
-            <div className="absolute inset-0">
-                {[...Array(6)].map((_, i) => (
+            {/* 3. Contenu Principal */}
+            <div className="relative h-full flex flex-col p-10 z-10 items-center justify-between">
+
+                {/* Header : Élégance Soft-Touch */}
+                <motion.div
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="text-center space-y-2"
+                >
+                    <div className="flex justify-center items-center gap-2 mb-1">
+                        <Sparkles size={14} className="text-rose-400" />
+                        <span className="text-[10px] font-bold text-rose-300 uppercase tracking-[0.4em]">Douceur & Amour</span>
+                        <Sparkles size={14} className="text-rose-400" />
+                    </div>
+                    <h1 className="text-4xl font-serif italic text-rose-900 tracking-tight leading-tight">
+                        {title}
+                    </h1>
+                </motion.div>
+
+                {/* Section Image : Le Cadre Organique */}
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="relative"
+                >
+                    {/* Blob animé derrière l'image */}
                     <motion.div
-                        key={i}
-                        className="absolute text-white/40 text-2xl"
-                        style={{
-                            left: `${20 + i * 15}%`,
-                            top: `${10 + (i % 3) * 30}%`,
-                        }}
                         animate={{
-                            x: [0, 40, 0],
-                            y: [0, -20, 0],
+                            borderRadius: ["40% 60% 70% 30% / 40% 50% 60% 50%", "60% 40% 30% 70% / 50% 60% 40% 60%", "40% 60% 70% 30% / 40% 50% 60% 50%"]
                         }}
-                        transition={{
-                            duration: 6 + i,
-                            repeat: Infinity,
-                            ease: 'easeInOut',
-                        }}
+                        transition={{ duration: 10, repeat: Infinity }}
+                        className="absolute -inset-4 bg-pink-100/50 blur-xl"
+                    />
+
+                    <div className="relative p-2 bg-white rounded-[2rem] shadow-xl border border-rose-50 overflow-hidden">
+                        <div className="w-44 h-44 rounded-[1.6rem] overflow-hidden">
+                            {imageUrl ? (
+                                <img src={imageUrl} alt={name} className="w-full h-full object-cover saturate-[1.1]" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-rose-50">
+                                    <Heart size={64} className="text-rose-200 fill-rose-100" />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Badge flottant Butterfly */}
+                    <motion.div
+                        animate={{ x: [0, 5, 0], y: [0, -10, 0], rotate: [0, 15, 0] }}
+                        transition={{ duration: 4, repeat: Infinity }}
+                        className="absolute -top-4 -right-4 text-3xl drop-shadow-md"
                     >
                         🦋
                     </motion.div>
-                ))}
-            </div>
-
-            {/* Contenu */}
-            <div className="relative h-full flex flex-col p-8 z-10">
-                {/* Header */}
-                <motion.div
-                    initial={{ x: -100, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="mb-6"
-                >
-                    <div className="flex items-center gap-3 mb-2">
-                        <Heart className="text-pink-100" size={28} fill="currentColor" />
-                        <h1 className="text-4xl font-bold text-white">
-                            {title}
-                        </h1>
-                    </div>
-                    <div className="w-32 h-1 bg-gradient-to-r from-pink-100 to-rose-200 rounded-full" />
                 </motion.div>
 
-                {/* Image/Nom */}
+                {/* Bloc Poème : La Note de Tendresse */}
                 <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.4, type: 'spring' }}
-                    className="flex-1 flex items-center justify-center mb-6"
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="w-full bg-white/70 backdrop-blur-md border border-white rounded-[2.5rem] p-8 shadow-sm relative overflow-hidden"
                 >
-                    <div className="bg-white/20 backdrop-blur-md rounded-3xl p-6 border-2 border-pink-100/40 shadow-2xl relative">
-                        {/* Couronne Florale */}
-                        {[...Array(6)].map((_, i) => (
-                            <motion.div
-                                key={i}
-                                className="absolute"
-                                style={{
-                                    top: '50%',
-                                    left: '50%',
-                                }}
-                                animate={{
-                                    rotate: [0 + i * 60, 360 + i * 60],
-                                    x: [0, 80 * Math.cos((i * Math.PI) / 3)],
-                                    y: [0, 80 * Math.sin((i * Math.PI) / 3)],
-                                }}
-                                transition={{
-                                    duration: 10,
-                                    repeat: Infinity,
-                                    ease: 'linear',
-                                }}
-                            >
-                                <Flower2 className="text-pink-200" size={16} />
-                            </motion.div>
-                        ))}
-
-                        {imageUrl ? (
-                            <div className="relative w-40 h-40 rounded-2xl overflow-hidden border-4 border-pink-100">
-                                <img
-                                    src={imageUrl}
-                                    alt={name}
-                                    className="w-full h-full object-cover"
-                                    crossOrigin="anonymous"
-                                    loading="lazy"
-                                />
-                            </div>
-                        ) : (
-                            <h2 className="text-6xl font-bold text-pink-50 px-8">
-                                {name}
-                            </h2>
-                        )}
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-rose-100">
+                        <Wind size={40} />
                     </div>
-                </motion.div>
 
-                {/* Poème */}
-                <motion.div
-                    initial={{ x: 100, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="bg-white rounded-3xl p-6 shadow-2xl"
-                >
-                    <div className="flex items-center gap-2 mb-3">
-                        <Flower2 className="text-pink-500" size={20} />
-                        <div className="flex-1 h-0.5 bg-gradient-to-r from-pink-400 to-transparent" />
-                    </div>
-                    <p className="text-gray-800 text-center whitespace-pre-line leading-relaxed font-medium">
-                        {poem}
+                    <p className="text-rose-900 text-center font-serif italic leading-relaxed text-xl mb-6">
+                        "{poem}"
                     </p>
-                    <div className="flex items-center gap-2 mt-3">
-                        <div className="flex-1 h-0.5 bg-gradient-to-l from-rose-400 to-transparent" />
-                        <Heart className="text-rose-500" size={20} fill="currentColor" />
+
+                    <div className="flex flex-col items-center">
+                        <div className="h-px w-8 bg-rose-200 mb-2" />
+                        <span className="text-2xl font-serif text-rose-800 tracking-tighter lowercase">
+                            {name}
+                        </span>
                     </div>
                 </motion.div>
+
+                {/* Footer : Micro-icônes */}
+                <div className="flex gap-6 opacity-20 text-rose-400">
+                    <Heart size={12} fill="currentColor" />
+                    <Heart size={12} fill="currentColor" />
+                    <Heart size={12} fill="currentColor" />
+                </div>
             </div>
         </motion.div>
     );

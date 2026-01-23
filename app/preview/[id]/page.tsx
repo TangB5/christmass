@@ -3,8 +3,8 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { toPng } from 'html-to-image';
-import { imagesToGif } from '@/lib/ffmpeg';
+
+
 
 // Components
 import Button from '@/components/ui/Button';
@@ -19,6 +19,14 @@ import {
     Printer, Film, Share, Sparkles
 } from 'lucide-react';
 import {getTemplateComponent} from "@/components/TemplateRoutes";
+import html2canvas from "html2canvas";
+import {domToCanvas} from "modern-screenshot";
+import {supabase} from "@/lib/supabaseClient";
+
+
+interface PageProps {
+    params: { id: string };
+}
 
 export default function PreviewPage() {
     const params = useParams();
@@ -31,6 +39,22 @@ export default function PreviewPage() {
     const [error, setError] = useState('');
     const [isExporting, setIsExporting] = useState(false);
     const [exportProgress, setExportProgress] = useState(0);
+
+    const cardToken = params.id;
+
+    useEffect(() => {
+        const recordView = async () => {
+            if (!cardToken) return;
+
+            try {
+                await supabase.rpc('increment_card_views', { t_token: cardToken });
+            } catch (error) {
+                console.error("Erreur lors de l'incrémentation des vues:", error);
+            }
+        };
+
+        recordView();
+    }, [cardToken]);
 
     const displayPoem = useMemo(() => {
         if (!card) return "";
@@ -63,43 +87,109 @@ export default function PreviewPage() {
         if (params.id) fetchCard();
     }, [params.id]);
 
-    const handleExportGif = async () => {
+    const handleExportVideo = async () => {
         if (!cardRef.current) return;
 
         try {
             setIsExporting(true);
             setExportProgress(0);
 
-            const images: string[] = [];
-            const frameCount = 15;
+            // 1. Canvas de sortie configuré pour la HD
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d', {
+                alpha: false, // Optimisation : pas de transparence pour gagner du temps
+                willReadFrequently: true
+            });
 
-            for (let i = 0; i < frameCount; i++) {
-                const dataUrl = await toPng(cardRef.current, {
-                    pixelRatio: 1.2,
-                    cacheBust: true,
-                    style: { transform: 'scale(1)' }
-                });
-                images.push(dataUrl);
+            // Scale 2 = Haute Définition (Nettoie les textes et les images)
+            const scale = 2;
 
-                setExportProgress(Math.round(((i + 1) / frameCount) * 100));
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
+            // Capture du premier frame pour caler les dimensions HD
+            const firstFrame = await domToCanvas(cardRef.current, { scale });
+            canvas.width = firstFrame.width;
+            canvas.height = firstFrame.height;
 
+            // 2. Stream à 24 FPS (Standard cinéma, plus rapide à générer que 30 ou 60)
+            const stream = canvas.captureStream(24);
+            const recorder = new MediaRecorder(stream, {
+                mimeType: 'video/webm;codecs=vp9',
+                videoBitsPerSecond: 8000000 // 8 Mbps pour une qualité HD nette
+            });
 
-            const blob = await imagesToGif(images, 400, 533, 6);
+            const chunks: Blob[] = [];
+            recorder.ondataavailable = (e) => chunks.push(e.data);
 
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${card?.name || 'carte'}_HD.webm`;
+                a.click();
+                setIsExporting(false);
+            };
 
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${card?.event_type || 'event'}-${card?.name || 'card'}.gif`;
-            a.click();
-            URL.revokeObjectURL(url);
+            recorder.start();
 
-            setExportProgress(100);
+            // Change 15000 (15s) par 60000 si tu veux vraiment 1 minute
+            const duration = 15000;
+            const startTime = Date.now();
+
+            const captureFrame = async () => {
+                const elapsed = Date.now() - startTime;
+
+                if (elapsed < duration && recorder.state === 'recording') {
+                    try {
+                        // domToCanvas est l'opération la plus lourde
+                        const frame = await domToCanvas(cardRef.current!, {
+                            scale,
+                            backgroundColor: '#050505',
+                            // On évite de recalculer les styles lourds à chaque frame
+                        });
+
+                        ctx?.drawImage(frame, 0, 0);
+
+                        setExportProgress(Math.round((elapsed / duration) * 100));
+
+                        // Laisser le navigateur respirer pour ne pas bloquer l'UI
+                        requestAnimationFrame(captureFrame);
+                    } catch (e) {
+                        requestAnimationFrame(captureFrame);
+                    }
+                } else {
+                    recorder.stop();
+                }
+            };
+
+            captureFrame();
 
         } catch (err) {
-            console.error('GIF export failed:', err);
+            console.error("Erreur HD Export:", err);
+            setIsExporting(false);
+        }
+    };
+
+    const handleExportPNG = async () => {
+        if (!cardRef.current) return;
+
+        try {
+            setIsExporting(true); // On affiche l'overlay de chargement
+
+            // On capture l'image en haute résolution
+            const canvas = await domToCanvas(cardRef.current, {
+                scale: 3, // Qualité supérieure pour l'image fixe
+                backgroundColor: '#050505'
+            });
+
+            // Conversion en lien de téléchargement
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `${card?.name || 'carte'}.png`;
+            link.href = dataUrl;
+            link.click();
+
+        } catch (err) {
+            console.error("Erreur lors de l'export PNG:", err);
         } finally {
             setIsExporting(false);
         }
@@ -150,6 +240,50 @@ export default function PreviewPage() {
 
     return (
         <div className="min-h-screen bg-[#030712] text-white pb-20 relative overflow-x-hidden mt-20">
+
+
+
+            <style jsx global>{`
+                @media print {
+                    @page {
+                        margin: 0;
+                        size: A4 portrait; /* Force le format A4 */
+                    }
+                    body {
+                        background: white !important;
+                        margin: 0 !important;
+                    }
+                    body * {
+                        visibility: hidden;
+                    }
+                    .print-section, .print-section * {
+                        visibility: visible;
+                    }
+                    .print-section {
+                        position: fixed;
+                        left: 0;
+                        top: 0;
+                        width: 210mm !important;
+                        height: 297mm !important;
+                        display: flex !important;
+                        align-items: center;
+                        justify-content: center;
+                        background: white !important;
+                        z-index: 9999;
+                    }
+                    /* On force la carte à prendre 95% de la largeur A4 */
+                    .print-section > div {
+                        width: 190mm !important;
+                        height: auto !important;
+                        aspect-ratio: 3/4;
+                        border: none !important;
+                        box-shadow: none !important;
+                        transform: none !important;
+                    }
+                }
+            `}</style>
+
+
             {/* Background Glows */}
             <div className="fixed inset-0 -z-10">
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-600/10 blur-[120px]" />
@@ -169,7 +303,7 @@ export default function PreviewPage() {
                             </div>
                             <Sparkles className="absolute -top-2 -right-2 text-white animate-pulse" />
                         </div>
-                        <h2 className="text-3xl font-black mb-2 tracking-tighter">Capture du GIF...</h2>
+                        <h2 className="text-3xl font-black mb-2 tracking-tighter">Capture du PNG...</h2>
                         <p className="text-gray-400 font-mono tracking-widest uppercase text-xs">{exportProgress}% terminé</p>
                         <div className="w-64 h-1.5 bg-white/10 rounded-full mt-6 overflow-hidden">
                             <motion.div
@@ -204,11 +338,11 @@ export default function PreviewPage() {
                         </Button>
                         <Button
                             className="rounded-2xl  text-black hover:bg-gray-200 shadow-xl shadow-white/5 font-bold"
-                            onClick={handleExportGif}
+                            onClick={handleExportVideo}
                             disabled={isExporting}
                         >
                             <Film className="w-4 h-4 mr-2" />
-                            {card.language === 'fr' ? 'Sauver en GIF' : 'Save as GIF'}
+                            {card.language === 'fr' ? 'Sauver en WebM' : 'Save as WebM'}
                         </Button>
                     </div>
                 </motion.div>
@@ -217,8 +351,7 @@ export default function PreviewPage() {
                     {/* Left: Card Preview */}
                     <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-7">
                         <div className="sticky top-12">
-                            <div ref={cardRef} className="relative p-1 bg-gradient-to-br from-white/20 via-transparent to-white/5 rounded-[2.8rem] shadow-2xl">
-                                <div className="rounded-[2.6rem] overflow-hidden bg-[#050505]">
+                            <div ref={cardRef} className="print-section relative p-1 bg-gradient-to-br from-white/20 via-transparent to-white/5 rounded-[2.8rem] shadow-2xl">                                <div className="rounded-[2.6rem] overflow-hidden bg-[#050505]">
                                     <TemplateComponent
                                         name={card.name}
                                         poem={displayPoem}
@@ -227,7 +360,7 @@ export default function PreviewPage() {
                                         isBusiness={!!card.business_name}
                                     />
                                 </div>
-                                <div className="absolute -top-4 -right-4 bg-christmas-gold text-black px-5 py-2 rounded-full font-black text-[10px] shadow-2xl rotate-12 uppercase tracking-widest border-2 border-white">
+                                <div className="print:hidden absolute -top-4 -right-4 bg-christmas-gold text-black px-5 py-2 rounded-full font-black text-[10px] shadow-2xl rotate-12 uppercase tracking-widest border-2 border-white">
                                     Collector ✨
                                 </div>
                             </div>
@@ -248,11 +381,12 @@ export default function PreviewPage() {
                                     <ShareButtons url={shareUrl} name={card.name} language={card.language} />
 
                                     <Button
-                                        className="w-full h-14 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold flex items-center justify-center gap-3 shadow-lg"
-                                        onClick={handleWhatsAppShare}
+                                        className="w-full h-14 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/10 font-bold flex items-center justify-center gap-3 shadow-lg transition-all"
+                                        onClick={handleExportPNG}
+                                        disabled={isExporting}
                                     >
-                                        <Share className="w-5 h-5 fill-white" />
-                                        WhatsApp Direct
+                                        <Download className="w-5 h-5" />
+                                        {card.language === 'fr' ? 'Enregistrer en PNG' : 'Save as PNG'}
                                     </Button>
                                 </div>
                             </div>

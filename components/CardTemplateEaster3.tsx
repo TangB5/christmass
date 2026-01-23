@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Sparkles, Flower2, Bird, Sun } from 'lucide-react';
 
 interface CardTemplate3Props {
     name: string;
@@ -11,155 +12,111 @@ interface CardTemplate3Props {
 }
 
 export default function CardTemplate3Easter({ name, poem, imageUrl, language }: CardTemplate3Props) {
-    const title = language === 'fr' ? 'Joyeuses Pâques !' : 'Happy Easter!';
+    const title = language === 'fr' ? 'Joyeuses Pâques' : 'Happy Easter';
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative w-full aspect-[3/4] bg-gradient-to-br from-purple-300 via-yellow-300 to-green-400 rounded-2xl overflow-hidden shadow-2xl"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative w-full aspect-[3/4] bg-[#fdfcf0] rounded-[2.5rem] overflow-hidden shadow-2xl border-[12px] border-white"
         >
-            {/* Cercles Printaniers */}
+            {/* 1. Fond Dégradé Printanier */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-yellow-50 to-green-100" />
+
+            {/* Formes organiques diffuses */}
             <motion.div
-                className="absolute w-40 h-40 bg-yellow-400 rounded-full opacity-40"
-                style={{ top: '10%', left: '5%' }}
-                animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
-                transition={{ duration: 6, repeat: Infinity }}
+                animate={{ scale: [1, 1.1, 1], rotate: [0, 90, 0] }}
+                transition={{ duration: 15, repeat: Infinity }}
+                className="absolute -top-20 -left-20 w-72 h-72 bg-yellow-200/40 rounded-full blur-[80px]"
             />
             <motion.div
-                className="absolute w-32 h-32 bg-purple-300 rounded-full opacity-40"
-                style={{ top: '50%', right: '10%' }}
-                animate={{ scale: [1, 1.4, 1], rotate: [360, 180, 0] }}
-                transition={{ duration: 7, repeat: Infinity }}
-            />
-            <motion.div
-                className="absolute w-28 h-28 bg-green-400 rounded-full opacity-30"
-                style={{ bottom: '15%', left: '20%' }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 5, repeat: Infinity }}
+                animate={{ scale: [1, 1.2, 1], rotate: [0, -90, 0] }}
+                transition={{ duration: 20, repeat: Infinity }}
+                className="absolute -bottom-20 -right-20 w-80 h-80 bg-green-200/40 rounded-full blur-[80px]"
             />
 
-            {/* Emojis de Pâques Bondissants */}
-            <div className="absolute inset-0">
-                {['🐰', '🥚', '🌷', '🐣', '🌸', '🦋'].map((emoji, i) => (
+            {/* 2. Contenu Principal */}
+            <div className="relative h-full flex flex-col items-center justify-between py-10 px-6 z-10">
+
+                {/* Header : Titre & Soleil */}
+                <div className="text-center relative">
                     <motion.div
-                        key={i}
-                        className="absolute text-5xl"
-                        style={{
-                            left: `${15 + i * 15}%`,
-                            top: `${20 + (i % 2) * 40}%`,
-                        }}
-                        animate={{
-                            y: [0, -25, 0],
-                            rotate: [0, 15, -15, 0],
-                            scale: [1, 1.2, 1],
-                        }}
-                        transition={{
-                            duration: 2 + i * 0.3,
-                            repeat: Infinity,
-                            delay: i * 0.2,
-                        }}
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                        className="absolute -top-6 -right-8 text-yellow-400/60"
                     >
-                        {emoji}
+                        <Sun size={32} />
                     </motion.div>
-                ))}
-            </div>
 
-            {/* Contenu */}
-            <div className="relative h-full flex flex-col items-center justify-between p-6 z-10">
-                {/* Header Joyeux */}
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: 'spring', bounce: 0.6 }}
-                    className="text-center"
-                >
-                    <motion.h1
-                        className="text-6xl font-black text-white mb-2"
-                        style={{
-                            textShadow: '5px 5px 0px rgba(0,0,0,0.3)',
-                        }}
-                        animate={{ rotate: [-3, 3, -3] }}
-                        transition={{ duration: 0.6, repeat: Infinity }}
-                    >
+                    <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-green-600 leading-tight tracking-tight">
                         {title}
-                    </motion.h1>
-                    <div className="flex justify-center gap-2 text-5xl">
-                        <motion.span animate={{ rotate: [0, 360] }} transition={{ duration: 3, repeat: Infinity }}>
-                            🐰
-                        </motion.span>
-                        <motion.span animate={{ scale: [1, 1.4, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                            🥚
-                        </motion.span>
-                        <motion.span animate={{ rotate: [360, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                            🌷
-                        </motion.span>
+                    </h1>
+                    <div className="flex justify-center gap-2 mt-1">
+                        <span className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Printemps 2026</span>
                     </div>
-                </motion.div>
+                </div>
 
-                {/* Image/Nom avec Cadre Coloré */}
-                <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.4, type: 'spring' }}
-                    className="relative"
-                >
-                    <div className="bg-white rounded-3xl p-2 shadow-2xl transform rotate-3">
-                        <div className="bg-gradient-to-br from-purple-200 via-yellow-200 to-green-200 rounded-2xl p-1">
-                            {imageUrl ? (
-                                <div className="relative w-36 h-36 rounded-2xl overflow-hidden">
-                                    <img
-                                        src={imageUrl}
-                                        alt={name}
-                                        className="w-full h-full object-cover"
-                                        crossOrigin="anonymous"
-                                        loading="lazy"
-                                    />
-                                </div>
-                            ) : (
-                                <div className="w-36 h-36 flex items-center justify-center bg-white rounded-2xl">
-                                    <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-yellow-500 to-green-500">
-                                        {name}
-                                    </h2>
-                                </div>
-                            )}
+                {/* Portrait : Style "Oeuf Moderne" */}
+                <div className="relative group">
+                    <motion.div
+                        animate={{ y: [0, -10, 0] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        className="relative z-10"
+                    >
+                        {/* Cadre en forme d'oeuf asymétrique */}
+                        <div className="p-2 bg-white rounded-[60%_60%_70%_70%/80%_80%_60%_60%] shadow-xl border border-white/50">
+                            <div className="w-40 h-52 rounded-[60%_60%_70%_70%/80%_80%_60%_60%] overflow-hidden bg-slate-50">
+                                {imageUrl ? (
+                                    <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-tr from-yellow-100 to-green-100">
+                                        <Bird size={48} className="text-green-400" />
+                                    </div>
+                                )}
+                            </div>
                         </div>
+
+                        {/* Badges Décoratifs fixés sur le cadre */}
+                        <div className="absolute -top-2 -left-2 bg-purple-400 text-white p-2.5 rounded-full shadow-lg border-4 border-white">
+                            <Flower2 size={18} />
+                        </div>
+                        <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-white p-2.5 rounded-full shadow-lg border-4 border-white">
+                            <span className="text-lg leading-none">🐰</span>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Message : Bento Box Soft */}
+                <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="w-full max-w-sm bg-white/80 backdrop-blur-sm border border-white rounded-[2rem] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]"
+                >
+                    <div className="flex justify-center gap-3 mb-4 text-slate-300">
+                        <Sparkles size={14} className="text-yellow-400" />
+                        <div className="h-[1px] w-8 bg-slate-100 self-center" />
+                        <span className="text-xl">🥚</span>
+                        <div className="h-[1px] w-8 bg-slate-100 self-center" />
+                        <Sparkles size={14} className="text-purple-400" />
                     </div>
-                    {/* Décorations */}
-                    <motion.div
-                        className="absolute -top-4 -right-4 text-5xl"
-                        animate={{ rotate: [0, 20, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                        🌸
-                    </motion.div>
-                    <motion.div
-                        className="absolute -bottom-4 -left-4 text-5xl"
-                        animate={{ rotate: [0, -20, 0] }}
-                        transition={{ duration: 1.8, repeat: Infinity }}
-                    >
-                        🐣
-                    </motion.div>
+
+                    <p className="text-slate-700 text-center font-medium leading-relaxed italic text-sm md:text-base">
+                        &#34;{poem}&#34;
+                    </p>
+
+                    <div className="mt-4 text-center">
+                        <span className="text-lg font-black text-purple-600 tracking-tight italic">
+                            — {name}
+                        </span>
+                    </div>
                 </motion.div>
 
-                {/* Boîte de Poème Printanière */}
-                <motion.div
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="bg-white rounded-3xl p-5 shadow-2xl border-4 border-yellow-300 max-w-md"
-                >
-                    <div className="text-center mb-2 text-3xl">
-                        🌷 🥚 🌷
-                    </div>
-                    <p className="text-gray-800 text-center whitespace-pre-line leading-relaxed font-bold text-lg">
-                        {poem}
-                    </p>
-                    <div className="text-center mt-2 text-3xl">
-                        🐰 🌸 🐰
-                    </div>
-                </motion.div>
+                {/* Footer discret */}
+                <div className="flex gap-4 opacity-20">
+                    <Flower2 size={12} />
+                    <Flower2 size={12} />
+                    <Flower2 size={12} />
+                </div>
             </div>
         </motion.div>
     );

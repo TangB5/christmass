@@ -35,7 +35,9 @@ function CreateContent() {
     // UI State
     const [step, setStep] = useState<'form' | 'preview'>('form');
     const [loading, setLoading] = useState(false);
+    const [selectingTemplateId, setSelectingTemplateId] = useState<TemplateId | null>(null);
     const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Form State
     const [name, setName] = useState('');
@@ -128,22 +130,55 @@ function CreateContent() {
             setLoading(false);
         }
     };
+
+
+
+
     const handleSelectTemplate = async (templateId: TemplateId) => {
-        setLoading(true);
+
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+
+        setSelectingTemplateId(templateId);
         try {
+            // On cherche le poème qui correspond EXACTEMENT à l'ID du bouton cliqué
             const selectedPoem = poems.find(p => p.template_id === templateId);
-            if (!selectedPoem) return;
+
+            if (!selectedPoem) {
+                console.error("ERREUR: Aucun poème trouvé pour l'ID", templateId);
+                setSelectingTemplateId(null);
+                return;
+            }
+
+            const payload = {
+                name,
+                templateId: templateId, // <--- C'est lui qu'on surveille
+                poem: selectedPoem.poem,
+                eventType
+            };
+            console.log("PAYLOAD ENVOYÉ À L'API :", payload);
+
+            if (!user?.id) {
+                setError(language === 'fr'
+                    ? "Vous devez être connecté pour enregistrer cette carte."
+                    : "You must be logged in to save this card.");
+                return;
+            }
 
             const data = await eventService.createCard({
-                name, gender, language, eventType,
-                templateId, poem: selectedPoem.poem, imageUrl
+                name,
+                gender,
+                language,
+                eventType,
+                templateId: templateId, // On utilise bien l'ID passé en paramètre
+                poem: selectedPoem.poem,
+                imageUrl,
+                user_id: user.id,
             });
 
             router.push(`/preview/${data.card.share_token}`);
         } catch (err) {
-            setError('Erreur de création');
-        } finally {
-            setLoading(false);
+            setSelectingTemplateId(null);
         }
     };
 
@@ -405,7 +440,8 @@ function CreateContent() {
 
                                             <Button
                                                 onClick={() => handleSelectTemplate(template.id)}
-                                                isLoading={loading}
+                                                isLoading={selectingTemplateId === template.id}
+                                                disabled={selectingTemplateId !== null && selectingTemplateId !== template.id}
                                                 className="w-full mt-8 h-14 rounded-xl text-white font-bold"
                                                 style={{
                                                     backgroundColor: eventConfig.colors.primary,

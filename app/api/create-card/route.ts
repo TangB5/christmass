@@ -5,29 +5,35 @@ import {supabaseAdmin} from "@/lib/supabaseAdmin";
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        // 1. AJOUT de event_type ici
-        const { name, gender, language, template_id, poem, image_url, event_type, user_id } = body;
+        const {
+            name,
+            gender,
+            language,
+            poem,
+            image_url,
+            event_type,
+            user_id
+        } = body;
 
-        // 2. Validation (ajoute event_type aux champs requis)
+        const template_id = body.template_id || body.templateId;
+
         if (!name || !gender || !language || !template_id || !poem || !event_type) {
+            console.log("Validation échouée. Reçu:", { name, template_id, event_type });
             return NextResponse.json(
-                { error: 'Missing required fields (including event_type)' },
+                { error: 'Missing required fields' },
                 { status: 400 }
             );
         }
 
-        // ... (tes autres validations) ...
-
         const shareToken = generateShareToken();
 
-        // 3. Insertion complète
         const { data, error } = await supabaseAdmin
             .from('cards')
             .insert({
                 name,
                 gender,
                 language,
-                template_id,
+                template_id: Number(template_id),
                 poem,
                 event_type,
                 image_url: image_url || null,

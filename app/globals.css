@@ -83,3 +83,33 @@
         scrollbar-width: none;
     }
 }
+
+@media print {
+
+    body * {
+        visibility: hidden;
+    }
+    /* Afficher uniquement la carte et ce qu'elle contient */
+    .print-section, .print-section * {
+        visibility: visible;
+    }
+    /* Positionner la carte en haut à gauche de la page imprimée */
+    .print-section {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none !important;
+        border: none !important;
+    }
+    /* Supprimer les fonds sombres pour économiser l'encre */
+    body {
+        background: white !important;
+    }
+}
+
+.test{
+    background: red !important;
+}

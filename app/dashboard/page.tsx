@@ -4,7 +4,7 @@ import {useState, useEffect, useMemo, useRef,Suspense} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutGrid, List, Plus, Search, Trash2, Send, Eye,
-    ExternalLink, Check, Calendar, Zap, ChevronRight, ChevronLeft
+    ExternalLink, Check, Calendar, Zap, ChevronRight, ChevronLeft, X
 } from 'lucide-react';
 import { EVENTS } from "@/lib/events";
 import { useSearchParams } from "next/navigation";
@@ -36,6 +36,7 @@ function DashboardContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedCards, setSelectedCards] = useState<Set<string>>(new Set());
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showCopyModal, setShowCopyModal] = useState(false);
 
     const [stats, setStats] = useState<CardStats>({
         total: 0,
@@ -90,6 +91,7 @@ function DashboardContent() {
                 .from('cards')
                 .select('*')
                 .eq('user_id', user.id)
+                .not('template_id', 'is', null)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -132,16 +134,19 @@ function DashboardContent() {
     };
 
 
-
     const validCards: CardData[] = useMemo(
         () =>
-            filteredCards.map(c => ({
-                ...c,
-                template_id: (Number(c.template_id) || 1) as TemplateId,
-                event_type: c.event_type as EventType,
-                created_at: c.created_at || new Date().toISOString(),
-                views_count: c.views_count || 0,
-            })),
+            filteredCards.map(c => {
+
+                return {
+                    ...c,
+                    // On garde la valeur brute de la DB, on ne force le "1" QUE si c'est vraiment vide
+                    template_id: c.template_id ? (Number(c.template_id) as TemplateId) : (1 as TemplateId),
+                    event_type: c.event_type as EventType,
+                    created_at: c.created_at || new Date().toISOString(),
+                    views_count: c.views_count || 0,
+                };
+            }),
         [filteredCards]
     );
 
@@ -156,7 +161,8 @@ function DashboardContent() {
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-        alert('✅ Lien copié !');
+        setShowCopyModal(true);
+        setTimeout(() => setShowCopyModal(false), 2000);
     };
 
     const handleDelete = async (cardIds: string[]) => {
@@ -326,7 +332,16 @@ function DashboardContent() {
 
             <AnimatePresence>
                 {showDeleteModal && (
-                    <DeleteModal count={selectedCards.size} onConfirm={() => handleDelete(Array.from(selectedCards))} onCancel={() => setShowDeleteModal(false)} />
+                    <DeleteModal
+                        count={selectedCards.size}
+                        onConfirm={() => handleDelete(Array.from(selectedCards))}
+                        onCancel={() => setShowDeleteModal(false)}
+                    />
+                )}
+
+
+                {showCopyModal && (
+                    <CopySuccessModal onClose={() => setShowCopyModal(false)} />
                 )}
             </AnimatePresence>
         </div>
@@ -370,25 +385,19 @@ function CardGridItem({ card, isSelected, onSelect, onShare }: { card: CardData,
             <div className="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-white/5 border border-white/10 group-hover:border-white/30 transition-all duration-500 shadow-2xl">
 
                 {/* 🎨 LA CORRECTION EST ICI : On adapte le scale pour remplir le conteneur */}
-                <div className="absolute inset-0 pointer-events-none flex items-start justify-center overflow-hidden">
-                    <div className="w-full h-full origin-top transition-transform duration-700 group-hover:scale-[1.05]"
-                         style={{ transform: 'scale(1)' }}>
-                        {/* Note: Si tes templates sont prévus pour du 1080px,
-                           utilise scale(0.4) ou ajuste le width.
-                           Ici on force l'occupation de l'espace.
-                        */}
-                        <div className="w-full h-full">
-                            <TemplatePreview
-                                name={card.name}
-                                poem={card.poem}
-                                imageUrl={card.image_url}
-                                language={card.language}
-                                //isPreview={true}  Optionnel si tu veux adapter le texte en miniature
-                            />
-                        </div>
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
+                    <div
+                        className="w-[400px] h-[533px] origin-center transition-transform duration-700 group-hover:scale-[0.55]"
+                        style={{ transform: 'scale(0.5)' }}
+                    >
+                        <TemplatePreview
+                            name={card.name}
+                            poem={card.poem}
+                            imageUrl={card.image_url}
+                            language={card.language}
+                        />
                     </div>
                 </div>
-
                 {/* Overlay au survol (Actions) */}
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-4 z-20">
                     <div className="flex gap-3 scale-90 group-hover:scale-100 transition-transform duration-300">
@@ -464,6 +473,33 @@ function DeleteModal({ count, onConfirm, onCancel }: { count: number, onConfirm:
                     <button onClick={onConfirm} className="w-full py-5 rounded-2xl bg-red-500 text-white font-black uppercase italic tracking-widest shadow-xl shadow-red-500/20">Confirmer la suppression</button>
                     <button onClick={onCancel} className="w-full py-5 rounded-2xl bg-white/5 text-gray-400 font-bold">Annuler</button>
                 </div>
+            </motion.div>
+        </div>
+    );
+}
+
+function CopySuccessModal({ onClose }: { onClose: () => void }) {
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 pointer-events-none">
+            <motion.div
+                initial={{ y: 20, opacity: 0, scale: 0.9 }}
+                animate={{ y: 0, opacity: 1, scale: 1 }}
+                exit={{ y: -20, opacity: 0, scale: 0.9 }}
+                className="bg-white text-black px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-white/20 pointer-events-auto"
+            >
+                <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                    <Check size={18} strokeWidth={3} />
+                </div>
+                <div className="flex flex-col">
+                    <span className="font-black uppercase italic text-sm tracking-tighter">Lien copié !</span>
+                    <span className="text-[10px] text-gray-500 font-bold uppercase">Prêt à être partagé</span>
+                </div>
+                <button
+                    onClick={onClose}
+                    className="ml-4 p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                    <X size={14} className="text-gray-400" />
+                </button>
             </motion.div>
         </div>
     );

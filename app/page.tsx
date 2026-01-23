@@ -171,7 +171,7 @@ export default function HomePage() {
                                 size="lg"
                                 variant="outline"
                                 primaryColor={currentEvent.colors.primary}
-                                onClick={() => setShowProModal(true)}
+                                onClick={() => router.push("/templates")}
                             >
                                 Explorer les modèles
                             </AdaptiveButton>
