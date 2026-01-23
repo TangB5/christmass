@@ -58,15 +58,20 @@ export const eventService = {
     /**
      * Création finale de la carte de partage
      */
+    /**
+     * Création finale de la carte de partage
+     */
     async createCard(params: {
         name: string,
         gender: Gender,
         language: Language,
         eventType: EventType,
-        templateId: TemplateId,
+        templateId: TemplateId, // Garde le CamelCase en entrée pour le TS
         poem: string,
         imageUrl: string | null
+        user_id: string | null;
     }) {
+
         const res = await fetch('/api/create-card', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -78,10 +83,14 @@ export const eventService = {
                 template_id: params.templateId,
                 poem: params.poem,
                 image_url: params.imageUrl,
+                user_id: params.user_id,
             }),
         });
 
-        if (!res.ok) throw new Error('Erreur de création');
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || 'Erreur de création');
+        }
 
         return await res.json();
     }

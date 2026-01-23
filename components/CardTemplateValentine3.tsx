@@ -2,187 +2,113 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import {CardTemplateProps} from "@/lib/types";
+import { CardTemplateProps } from "@/lib/types";
 
-
-
-export default function CardTemplate3Valentine({ name, poem, imageUrl, language,isBusiness = false }: CardTemplateProps) {
-    const title = language === 'fr'
-        ? (isBusiness ? 'Joyeuse Saint-Valentin' : 'Je t\'aime')
-        : (isBusiness ? 'Happy Valentine\'s Day' : 'I Love You');
-
+export default function CardTemplateModernArt({ name, poem, imageUrl, language }: CardTemplateProps) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative w-full aspect-[3/4] bg-gradient-to-br from-pink-300 via-red-400 to-pink-500 rounded-2xl overflow-hidden shadow-2xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="relative w-full aspect-[3/4] bg-[#F5F2ED] rounded-[2rem] overflow-hidden shadow-2xl border border-black/5"
         >
-            {/* Cercles Roses Ludiques */}
-            <motion.div
-                className="absolute w-40 h-40 bg-red-300 rounded-full opacity-40"
-                style={{ top: '15%', left: '10%' }}
-                animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
-                transition={{ duration: 6, repeat: Infinity }}
-            />
-            <motion.div
-                className="absolute w-32 h-32 bg-pink-200 rounded-full opacity-40"
-                style={{ top: '60%', right: '5%' }}
-                animate={{ scale: [1, 1.4, 1], rotate: [360, 180, 0] }}
-                transition={{ duration: 7, repeat: Infinity }}
-            />
-            <motion.div
-                className="absolute w-28 h-28 bg-red-400 rounded-full opacity-30"
-                style={{ bottom: '20%', left: '15%' }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 5, repeat: Infinity }}
-            />
+            {/* Formes Géométriques de fond (Abstrait) */}
+            <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-[#E2D1C3] rounded-full blur-3xl opacity-60" />
+            <div className="absolute bottom-[-5%] left-[-5%] w-48 h-48 bg-[#B4A79E] rounded-full blur-2xl opacity-40" />
 
-            {/* Emojis Romantiques Bondissants */}
-            <div className="absolute inset-0">
-                {['💕', '💖', '💗', '💝', '💘', '❤️'].map((emoji, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute text-5xl"
-                        style={{
-                            left: `${15 + i * 15}%`,
-                            top: `${20 + (i % 2) * 40}%`,
-                        }}
-                        animate={{
-                            y: [0, -30, 0],
-                            rotate: [0, 20, -20, 0],
-                            scale: [1, 1.3, 1],
-                        }}
-                        transition={{
-                            duration: 2 + i * 0.3,
-                            repeat: Infinity,
-                            delay: i * 0.2,
-                        }}
-                    >
-                        {emoji}
-                    </motion.div>
-                ))}
+            {/* Typographie Géante en Arrière-plan (Effet Outline) */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+                <span className="text-[12rem] font-black text-black/[0.03] uppercase leading-none rotate-90">
+                    {name}
+                </span>
             </div>
 
-            {/* Contenu */}
-            <div className="relative h-full flex flex-col items-center justify-between p-6 z-10">
-                {/* Header Romantique */}
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: 'spring', bounce: 0.6 }}
-                    className="text-center"
-                >
-                    <motion.h1
-                        className="text-6xl font-black text-white mb-2"
-                        style={{
-                            textShadow: '5px 5px 0px rgba(0,0,0,0.3)',
-                        }}
-                        animate={{
-                            scale: [1, 1.1, 1],
-                            rotate: [-2, 2, -2]
-                        }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                    >
-                        {title}
-                    </motion.h1>
-                    <div className="flex justify-center gap-2 text-5xl">
-                        <motion.span
-                            animate={{
-                                scale: [1, 1.5, 1],
-                                rotate: [0, 20, 0],
-                            }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                        >
-                            💖
-                        </motion.span>
-                        <motion.span
-                            animate={{ y: [0, -10, 0] }}
-                            transition={{ duration: 1, repeat: Infinity }}
-                        >
-                            💕
-                        </motion.span>
-                        <motion.span
-                            animate={{
-                                scale: [1, 1.5, 1],
-                                rotate: [0, -20, 0],
-                            }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                        >
-                            💖
-                        </motion.span>
-                    </div>
-                </motion.div>
+            <div className="relative h-full flex flex-col p-8 md:p-12 z-10">
 
-                {/* Image/Nom avec Cadre Mignon */}
-                <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.4, type: 'spring' }}
-                    className="relative"
-                >
-                    <div className="bg-white rounded-3xl p-2 shadow-2xl transform -rotate-2">
-                        <div className="bg-gradient-to-br from-pink-100 to-red-200 rounded-2xl p-1">
-                            {imageUrl ? (
-                                <div className="relative w-36 h-36 rounded-2xl overflow-hidden">
-                                    <img
-                                        src={imageUrl}
-                                        alt={name}
-                                        className="w-full h-full object-cover"
-                                        crossOrigin="anonymous"
-                                        loading="lazy"
-                                    />
-                                </div>
-                            ) : (
-                                <div className="w-36 h-36 flex items-center justify-center bg-white rounded-2xl">
-                                    <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-pink-600">
-                                        {name}
-                                    </h2>
-                                </div>
-                            )}
+                {/* Header Style Éditorial */}
+                <header className="flex justify-between items-start mb-8">
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40 mb-1">
+                            {language === 'fr' ? 'Note Personnelle' : 'Personal Note'}
+                        </span>
+                        <div className="h-1 w-12 bg-black" />
+                    </div>
+                    <span className="font-serif italic text-lg text-black/60">No. 001</span>
+                </header>
+
+                <div className="flex-1 flex flex-col md:flex-row gap-8 items-center md:items-end">
+
+                    {/* Portrait avec masque asymétrique */}
+                    <motion.div
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        className="relative w-48 h-64 md:w-56 md:h-72 shrink-0 shadow-2xl rotate-[-2deg]"
+                    >
+                        {imageUrl ? (
+                            <div className="w-full h-full rounded-2xl overflow-hidden border-[8px] border-white shadow-xl">
+                                <img
+                                    src={imageUrl}
+                                    alt={name}
+                                    className="w-full h-full object-cover scale-110 hover:scale-100 transition-transform duration-700"
+                                    crossOrigin="anonymous"
+                                />
+                            </div>
+                        ) : (
+                            <div className="w-full h-full bg-neutral-200 rounded-2xl flex items-center justify-center">
+                                <div className="w-12 h-12 border-2 border-black/10 rounded-full" />
+                            </div>
+                        )}
+                        {/* Petit label scotché */}
+                        <div className="absolute -bottom-4 -right-4 bg-white px-4 py-2 shadow-lg rounded-sm rotate-[5deg]">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-black">
+                                {name}
+                            </span>
                         </div>
-                    </div>
-                    {/* Cœurs Décoratifs */}
-                    <motion.div
-                        className="absolute -top-4 -right-4 text-5xl"
-                        animate={{
-                            rotate: [0, 15, -15, 0],
-                            scale: [1, 1.2, 1],
-                        }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                    >
-                        💝
                     </motion.div>
-                    <motion.div
-                        className="absolute -bottom-4 -left-4 text-5xl"
-                        animate={{
-                            rotate: [0, -15, 15, 0],
-                            scale: [1, 1.2, 1],
-                        }}
-                        transition={{ duration: 2.2, repeat: Infinity }}
-                    >
-                        💘
-                    </motion.div>
-                </motion.div>
 
-                {/* Boîte de Poème Romantique */}
-                <motion.div
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="bg-white rounded-3xl p-5 shadow-2xl border-4 border-pink-300 max-w-md"
-                >
-                    <div className="text-center mb-2 text-3xl">
-                        💖 💕 💖
-                    </div>
-                    <p className="text-gray-800 text-center whitespace-pre-line leading-relaxed font-bold text-lg">
-                        {poem}
+                    {/* Zone de texte alignée à droite */}
+                    <motion.div
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className="flex-1 flex flex-col justify-end text-right"
+                    >
+                        <div className="space-y-4">
+                            <div className="max-h-[180px] overflow-y-auto custom-scrollbar-minimal">
+                                <p className="text-xl md:text-2xl font-serif leading-snug text-black/80 italic">
+                                    {poem}
+                                </p>
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <div className="w-2 h-2 rounded-full bg-black" />
+                                <div className="w-20 h-[1px] bg-black/20 self-center" />
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Footer Minimaliste */}
+                <footer className="mt-12 flex justify-between items-end border-t border-black/5 pt-6">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/30">
+                        {new Date().getFullYear()} © Studio Art
                     </p>
-                    <div className="text-center mt-2 text-3xl">
-                        💗 💝 💗
+                    <div className="flex gap-4">
+                        <div className="w-3 h-3 border border-black rounded-full" />
+                        <div className="w-3 h-3 bg-black rounded-full" />
                     </div>
-                </motion.div>
+                </footer>
             </div>
+
+            <style jsx>{`
+                .custom-scrollbar-minimal::-webkit-scrollbar {
+                    width: 2px;
+                }
+                .custom-scrollbar-minimal::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar-minimal::-webkit-scrollbar-thumb {
+                    background: rgba(0, 0, 0, 0.1);
+                }
+            `}</style>
         </motion.div>
     );
 }

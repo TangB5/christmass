@@ -7,7 +7,7 @@ export type Language = 'fr' | 'en';
 
 export type Gender = 'boy' | 'girl' | 'neutral';
 
-export type TemplateId = 1 | 2 | 3 | 4;
+export type TemplateId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 export type EventType = 'christmas' | 'newyear' | 'valentine' | 'easter' | 'birthday' | 'mothersday' | 'fathersday';
 

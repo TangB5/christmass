@@ -133,22 +133,43 @@ export async function generatePoems(
         ? (language === 'fr' ? eventConfig.name.fr : eventConfig.name.en)
         : (language === 'fr' ? 'Fête' : 'Celebration');
 
-    const prompt = `Act as a professional poet. Generate 4 short festive poems (4 lines each) to wish ${eventContext} to ${name} (${label}) in ${language === 'fr' ? 'French' : 'English'}.
-    Theme: ${themeName}.
-    
-    Styles required:
-    1. Classic & Traditional
-    2. Modern & Cheerful
-    3. Childlike & Playful
-    4. Elegant & Luxury
-    
-    Requirements:
-    - Each poem must include the name: ${name}
-    - Unique and warm tone
-    - Return ONLY a JSON array of objects.
-    
-    Format: [{"template_id": 1, "poem": "..."}, {"template_id": 2, "poem": "..."}, {"template_id": 3, "poem": "..."}, {"template_id": 4, "poem": "..."}]`;
+    const prompt = `Act as a professional poet and linguist. Generate 10 unique festive poems to wish ${eventContext} to ${name} (${label}) in ${language === 'fr' ? 'French' : 'English'}. 
+Theme: ${themeName}.
 
+SPECIFIC CONTENT RULES:
+- For ODD template IDs (1, 3, 5, 7, 9): Generate a 4-line poem. The first 2 lines must explore the ETYMOLOGY or deep meaning of the name "${name}", and the last 2 lines must be festive wishes.
+- For EVEN template IDs (2, 4, 6, 8, 10): Generate an ACROSTIC poem where each line starts with a letter of the name "${name}". The number of lines MUST equal the number of letters in the name.
+
+STYLES MAPPING:
+1. Classic & Traditional (Style: Etymology, 4 lines)
+2. Modern & Cheerful (Style: Acrostic, length based on name)
+3. Childlike & Playful (Style: Etymology, 4 lines)
+4. Elegant & Luxury (Style: Acrostic, length based on name)
+5. Vintage Scrapbook (Style: Etymology, 4 lines)
+6. Cosmic Minimalist (Style: Acrostic, length based on name)
+7. Neo-Brutalist Pop (Style: Etymology, 4 lines)
+8. Botanical Zen (Style: Acrostic, length based on name)
+9. Cinematic Dark (Style: Etymology, 4 lines)
+10. Bauhaus Geometric (Style: Acrostic, length based on name)
+
+Requirements:
+- Tone: Warm, creative, and strictly following the assigned style.
+- Return ONLY a JSON array of 10 objects.
+- For acrostics, ensure the lines are poetic and not just single words.
+- For etymology, be linguistically accurate yet poetic.
+
+Format: [
+  {"template_id": 1, "poem": "..."},
+  {"template_id": 2, "poem": "..."},
+  {"template_id": 3, "poem": "..."},
+  {"template_id": 4, "poem": "..."},
+  {"template_id": 5, "poem": "..."},
+  {"template_id": 6, "poem": "..."},
+  {"template_id": 7, "poem": "..."},
+  {"template_id": 8, "poem": "..."},
+  {"template_id": 9, "poem": "..."},
+  {"template_id": 10, "poem": "..."}
+]`;
     const text = await callGenerateContentWithRetry(prompt);
 
     const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();

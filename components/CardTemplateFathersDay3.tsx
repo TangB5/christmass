@@ -2,186 +2,126 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import {CardTemplateProps} from "@/lib/types";
+import { Trophy, Star, ShieldCheck, Zap, Award, Crown } from 'lucide-react';
+import { CardTemplateProps } from "@/lib/types";
 
-
-
-export default function CardTemplate3FathersDay({ name, poem, imageUrl, language,isBusiness = false }: CardTemplateProps) {
+export default function CardTemplate3FathersDay({ name, poem, imageUrl, language, isBusiness = false }: CardTemplateProps) {
     const title = language === 'fr'
         ? (isBusiness ? 'Bonne Fête des Pères' : 'Bonne Fête Papa')
         : 'Happy Father\'s Day';
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative w-full aspect-[3/4] bg-gradient-to-br from-blue-300 via-cyan-400 to-blue-500 rounded-2xl overflow-hidden shadow-2xl"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative w-full aspect-[3/4] bg-[#0f172a] rounded-[2.5rem] overflow-hidden shadow-2xl border-[10px] border-[#1e293b]"
         >
-            {/* Cercles Bleus Dynamiques */}
-            <motion.div
-                className="absolute w-40 h-40 bg-blue-400 rounded-full opacity-40"
-                style={{ top: '10%', left: '5%' }}
-                animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
-                transition={{ duration: 6, repeat: Infinity }}
+            {/* 1. Fond : Grille Technique (Blueprint) */}
+            <div className="absolute inset-0 opacity-20"
+                 style={{
+                     backgroundImage: `radial-gradient(#38bdf8 1px, transparent 1px)`,
+                     backgroundSize: '24px 24px'
+                 }}
             />
-            <motion.div
-                className="absolute w-32 h-32 bg-cyan-300 rounded-full opacity-40"
-                style={{ top: '50%', right: '10%' }}
-                animate={{ scale: [1, 1.4, 1], rotate: [360, 180, 0] }}
-                transition={{ duration: 7, repeat: Infinity }}
-            />
-            <motion.div
-                className="absolute w-28 h-28 bg-blue-500 rounded-full opacity-30"
-                style={{ bottom: '15%', left: '20%' }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 5, repeat: Infinity }}
-            />
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-transparent to-cyan-500/20" />
 
-            {/* Emojis Papa Sympas */}
-            <div className="absolute inset-0">
-                {['⭐', '🏆', '💪', '👔', '🎖️', '⚡'].map((emoji, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute text-5xl"
-                        style={{
-                            left: `${15 + i * 15}%`,
-                            top: `${20 + (i % 2) * 40}%`,
-                        }}
-                        animate={{
-                            y: [0, -20, 0],
-                            rotate: [0, 15, -15, 0],
-                            scale: [1, 1.2, 1],
-                        }}
-                        transition={{
-                            duration: 2 + i * 0.3,
-                            repeat: Infinity,
-                            delay: i * 0.2,
-                        }}
-                    >
-                        {emoji}
-                    </motion.div>
-                ))}
+            {/* 2. Éléments Décoratifs Flottants (Épurés) */}
+            <div className="absolute inset-0 pointer-events-none">
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="absolute -top-10 -right-10 text-blue-500/10"
+                >
+                    <ShieldCheck size={280} />
+                </motion.div>
             </div>
 
-            {/* Contenu */}
-            <div className="relative h-full flex flex-col items-center justify-between p-6 z-10">
-                {/* Header Dynamique */}
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: 'spring', bounce: 0.6 }}
-                    className="text-center"
-                >
-                    <motion.h1
-                        className="text-5xl font-black text-white mb-2"
-                        style={{
-                            textShadow: '4px 4px 0px rgba(0,0,0,0.2)',
-                        }}
-                        animate={{ rotate: [-2, 2, -2] }}
-                        transition={{ duration: 0.8, repeat: Infinity }}
+            {/* 3. Contenu Principal */}
+            <div className="relative h-full flex flex-col items-center justify-between py-10 px-6 z-10">
+
+                {/* Header : Style Insigne */}
+                <div className="text-center">
+                    <motion.div
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        className="flex items-center justify-center gap-2 mb-2"
                     >
+                        <Star size={16} className="text-yellow-400 fill-yellow-400" />
+                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.4em]">Numéro #1</span>
+                        <Star size={16} className="text-yellow-400 fill-yellow-400" />
+                    </motion.div>
+
+                    <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic leading-none">
                         {title}
-                    </motion.h1>
-                    <div className="flex justify-center gap-2 text-5xl">
-                        <motion.span
-                            animate={{
-                                rotate: [0, 360],
-                                scale: [1, 1.3, 1],
-                            }}
-                            transition={{ duration: 3, repeat: Infinity }}
-                        >
-                            ⭐
-                        </motion.span>
-                        <motion.span
-                            animate={{
-                                y: [0, -10, 0],
-                                scale: [1, 1.3, 1],
-                            }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                        >
-                            🏆
-                        </motion.span>
-                        <motion.span
-                            animate={{
-                                rotate: [360, 0],
-                                scale: [1, 1.3, 1],
-                            }}
-                            transition={{ duration: 3, repeat: Infinity }}
-                        >
-                            ⚡
-                        </motion.span>
-                    </div>
-                </motion.div>
+                    </h1>
+                </div>
 
-                {/* Image/Nom avec Cadre Fort */}
-                <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.4, type: 'spring' }}
-                    className="relative"
-                >
-                    <div className="bg-white rounded-3xl p-2 shadow-2xl transform -rotate-1">
-                        <div className="bg-gradient-to-br from-blue-100 via-cyan-100 to-blue-200 rounded-2xl p-1">
-                            {imageUrl ? (
-                                <div className="relative w-36 h-36 rounded-2xl overflow-hidden">
-                                    <img
-                                        src={imageUrl}
-                                        alt={name}
-                                        className="w-full h-full object-cover"
-                                        crossOrigin="anonymous"
-                                        loading="lazy"
-                                    />
-                                </div>
-                            ) : (
-                                <div className="w-36 h-36 flex items-center justify-center bg-white rounded-2xl">
-                                    <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600">
-                                        {name}
-                                    </h2>
-                                </div>
-                            )}
+                {/* Portrait : Style Médaille / Octogonal */}
+                <div className="relative group">
+                    <motion.div
+                        initial={{ scale: 0.5, rotate: -45 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        className="relative z-10"
+                    >
+                        {/* Cadre en acier brossé */}
+                        <div className="p-1.5 bg-gradient-to-tr from-slate-400 via-white to-slate-400 rounded-3xl shadow-[0_0_30px_rgba(56,189,248,0.3)]">
+                            <div className="w-44 h-44 rounded-[1.4rem] overflow-hidden bg-slate-800 border-2 border-slate-900">
+                                {imageUrl ? (
+                                    <img src={imageUrl} alt={name} className="w-full h-full object-cover saturate-[1.1]" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-900 to-slate-900">
+                                        <Crown size={64} className="text-blue-500/30" />
+                                    </div>
+                                )}
+                            </div>
                         </div>
+
+                        {/* Badges de Victoire */}
+                        <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="absolute -top-4 -left-4 bg-yellow-500 text-slate-900 p-2.5 rounded-xl shadow-lg border-2 border-white"
+                        >
+                            <Trophy size={20} fill="currentColor" />
+                        </motion.div>
+                        <div className="absolute -bottom-4 -right-4 bg-blue-500 text-white p-2.5 rounded-xl shadow-lg border-2 border-white">
+                            <Zap size={20} fill="currentColor" />
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Bloc Poème : "Dark Mode" Premium */}
+                <motion.div
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="w-full max-w-sm bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-3xl p-6 shadow-2xl relative overflow-hidden"
+                >
+                    {/* Accent de côté */}
+                    <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500" />
+
+                    <div className="flex justify-between items-center mb-4 text-slate-500">
+                        <Award size={18} />
+                        <div className="h-[1px] flex-1 mx-4 bg-slate-800" />
+                        <span className="text-xs font-mono">2026</span>
                     </div>
-                    {/* Badges et Étoiles */}
-                    <motion.div
-                        className="absolute -top-4 -right-4 text-5xl"
-                        animate={{
-                            rotate: [0, 360],
-                            scale: [1, 1.2, 1],
-                        }}
-                        transition={{ duration: 4, repeat: Infinity }}
-                    >
-                        🏆
-                    </motion.div>
-                    <motion.div
-                        className="absolute -bottom-4 -left-4 text-5xl"
-                        animate={{
-                            rotate: [0, -20, 0],
-                            scale: [1, 1.15, 1],
-                        }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                    >
-                        ⭐
-                    </motion.div>
+
+                    <p className="text-slate-200 text-center font-bold leading-relaxed italic text-base md:text-lg">
+                        "{poem}"
+                    </p>
+
+                    <div className="mt-6 text-center">
+                        <span className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 uppercase tracking-tighter">
+                            — {name}
+                        </span>
+                    </div>
                 </motion.div>
 
-                {/* Boîte de Poème Fort */}
-                <motion.div
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="bg-white rounded-3xl p-5 shadow-2xl border-4 border-blue-300 max-w-md"
-                >
-                    <div className="text-center mb-2 text-3xl">
-                        ⭐ 💪 ⭐
-                    </div>
-                    <p className="text-gray-800 text-center whitespace-pre-line leading-relaxed font-bold text-lg">
-                        {poem}
-                    </p>
-                    <div className="text-center mt-2 text-3xl">
-                        🏆 ⚡ 🏆
-                    </div>
-                </motion.div>
+                {/* Footer discret : Icônes de Force */}
+                <div className="flex gap-6 opacity-30">
+                    <Star size={12} className="text-white" />
+                    <Star size={12} className="text-white" />
+                    <Star size={12} className="text-white" />
+                </div>
             </div>
         </motion.div>
     );

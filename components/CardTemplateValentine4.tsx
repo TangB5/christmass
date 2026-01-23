@@ -2,202 +2,144 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Sparkles } from 'lucide-react';
-import {CardTemplateProps} from "@/lib/types";
+import { Heart, Sparkles, Quote } from 'lucide-react';
+import { CardTemplateProps } from "@/lib/types";
 
-
-
-export default function CardTemplate4Valentine({ name, poem, imageUrl, language,isBusiness = false }: CardTemplateProps) {
+export default function CardTemplate4Valentine({ name, poem, imageUrl, language, isBusiness = false }: CardTemplateProps) {
     const title = language === 'fr'
         ? (isBusiness ? 'Joyeuse Saint-Valentin' : 'Mon Amour')
         : (isBusiness ? 'Happy Valentine\'s Day' : 'My Love');
 
     return (
         <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-            className="relative w-full aspect-[3/4] bg-gradient-to-br from-rose-950 via-red-950 to-slate-950 rounded-2xl overflow-hidden shadow-2xl"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="relative w-full aspect-[3/4] bg-[#1a0b0d] rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-4 border-[#2a1215]"
         >
-            {/* Pattern Romantique */}
-            <div className="absolute inset-0 opacity-5">
-                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <pattern id="elegant-val" width="60" height="60" patternUnits="userSpaceOnUse">
-                            <path d="M30 15 Q35 10, 40 15 Q45 20, 40 25 L30 35 L20 25 Q15 20, 20 15 Q25 10, 30 15" fill="white" opacity="0.3"/>
-                        </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#elegant-val)" />
-                </svg>
-            </div>
+            {/* 1. Luxurious Velvet Background Effect */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_#3d131a_0%,_#1a0b0d_100%)]" />
 
-            {/* Pétales de Rose Dorés */}
-            <div className="absolute inset-0">
-                {[...Array(25)].map((_, i) => (
+            {/* 2. Animated Gold Dust Particles */}
+            <div className="absolute inset-0 pointer-events-none">
+                {[...Array(20)].map((_, i) => (
                     <motion.div
                         key={i}
-                        className="absolute w-1 h-1 bg-rose-300 rounded-full"
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
+                        className="absolute w-[2px] h-[2px] bg-rose-200/40 rounded-full"
+                        initial={{
+                            x: Math.random() * 100 + "%",
+                            y: Math.random() * 100 + "%",
+                            opacity: 0
                         }}
                         animate={{
-                            opacity: [0, 0.6, 0],
-                            scale: [0, 1, 0],
+                            y: [null, "-20%"],
+                            opacity: [0, 1, 0]
                         }}
                         transition={{
-                            duration: Math.random() * 4 + 3,
+                            duration: Math.random() * 5 + 5,
                             repeat: Infinity,
-                            delay: Math.random() * 3,
+                            delay: Math.random() * 5
                         }}
                     />
                 ))}
             </div>
 
-            {/* Bordure Élégante */}
-            <div className="absolute inset-6 border border-rose-300/30 rounded-lg" />
+            {/* 3. Decorative Frame (Double Border) */}
+            <div className="absolute inset-4 border border-rose-300/10 rounded-xl" />
+            <div className="absolute inset-6 border border-rose-300/20 rounded-lg" />
 
-            {/* Contenu */}
-            <div className="relative h-full flex flex-col items-center justify-between p-10 z-10">
-                {/* Header Romantique */}
+            {/* Content Container */}
+            <div className="relative h-full flex flex-col items-center justify-between py-12 px-8 z-10">
+
+                {/* Header Section */}
                 <motion.div
-                    initial={{ y: -30, opacity: 0 }}
+                    initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3, duration: 0.8 }}
-                    className="text-center space-y-3"
+                    transition={{ delay: 0.5 }}
+                    className="text-center space-y-4"
                 >
-                    <div className="flex items-center justify-center gap-3">
-                        <motion.div
-                            className="w-12 h-px bg-gradient-to-r from-transparent via-rose-300 to-transparent"
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: 1 }}
-                            transition={{ delay: 0.5, duration: 0.8 }}
-                        />
-                        <Heart className="text-rose-300 w-5 h-5" fill="currentColor" />
-                        <motion.div
-                            className="w-12 h-px bg-gradient-to-r from-transparent via-rose-300 to-transparent"
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: 1 }}
-                            transition={{ delay: 0.5, duration: 0.8 }}
-                        />
+                    <div className="flex items-center justify-center gap-4">
+                        <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-rose-300/50" />
+                        <Sparkles className="text-rose-300/60 w-4 h-4" />
+                        <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-rose-300/50" />
                     </div>
-                    <h1 className="text-4xl font-serif text-rose-300 tracking-wide italic">
+                    <h1 className="text-3xl md:text-4xl font-serif text-rose-100 tracking-[0.2em] uppercase italic">
                         {title}
                     </h1>
                 </motion.div>
 
-                {/* Image/Nom avec Halo Romantique */}
+                {/* Portrait Section */}
                 <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
+                    initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.5, duration: 0.8 }}
-                    className="flex-1 flex items-center justify-center"
+                    transition={{ delay: 0.8, duration: 1 }}
+                    className="relative"
                 >
+                    {/* Floating Glow */}
+                    <div className="absolute -inset-10 bg-rose-500/10 blur-[60px] rounded-full" />
+
                     {imageUrl ? (
-                        <div className="relative">
+                        <div className="relative group">
+                            {/* Orbital Hearts */}
                             <motion.div
-                                className="absolute inset-0 bg-rose-400/30 blur-2xl rounded-full"
-                                animate={{
-                                    scale: [1, 1.3, 1],
-                                }}
-                                transition={{ duration: 3, repeat: Infinity }}
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                                className="absolute -inset-4 border border-dashed border-rose-300/20 rounded-full"
                             />
-                            <div className="relative w-44 h-44 rounded-full overflow-hidden border-2 border-rose-300 shadow-2xl">
-                                <img
-                                    src={imageUrl}
-                                    alt={name}
-                                    className="absolute inset-0 w-full h-full object-cover"
-                                    crossOrigin="anonymous"
-                                    loading="lazy"
-                                />
+                            <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full p-1.5 bg-gradient-to-b from-rose-200/50 to-rose-900/50 shadow-2xl">
+                                <div className="w-full h-full rounded-full overflow-hidden border-2 border-[#1a0b0d]">
+                                    <img
+                                        src={imageUrl}
+                                        alt={name}
+                                        className="w-full h-full object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-700"
+                                    />
+                                </div>
                             </div>
-                            {/* Cœurs Dorés Autour */}
-                            {[...Array(6)].map((_, i) => (
-                                <motion.div
-                                    key={i}
-                                    className="absolute"
-                                    style={{
-                                        top: '50%',
-                                        left: '50%',
-                                    }}
-                                    animate={{
-                                        rotate: [0 + i * 60, 360 + i * 60],
-                                        x: [0, 90 * Math.cos((i * Math.PI) / 3)],
-                                        y: [0, 90 * Math.sin((i * Math.PI) / 3)],
-                                        opacity: [0.3, 0.7, 0.3],
-                                    }}
-                                    transition={{
-                                        duration: 8,
-                                        repeat: Infinity,
-                                        ease: 'linear',
-                                    }}
-                                >
-                                    <Heart className="text-rose-300 w-3 h-3" fill="currentColor" />
-                                </motion.div>
-                            ))}
                         </div>
                     ) : (
-                        <motion.h2
-                            className="text-7xl font-serif text-transparent bg-clip-text bg-gradient-to-r from-rose-300 to-pink-300 text-center"
-                            animate={{
-                                textShadow: [
-                                    '0 0 20px rgba(253, 164, 175, 0.5)',
-                                    '0 0 30px rgba(253, 164, 175, 0.7)',
-                                    '0 0 20px rgba(253, 164, 175, 0.5)',
-                                ],
-                            }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                        >
-                            {name}
-                        </motion.h2>
+                        <div className="text-center">
+                            <h2 className="text-6xl font-serif text-rose-100 drop-shadow-2xl italic tracking-tighter">
+                                {name}
+                            </h2>
+                            <Heart className="mx-auto mt-4 text-rose-300/40 w-8 h-8 fill-current" />
+                        </div>
                     )}
                 </motion.div>
 
-                {/* Poème Romantique */}
+                {/* Poem Section (The Vellum Paper) */}
                 <motion.div
-                    initial={{ y: 30, opacity: 0 }}
+                    initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.7, duration: 0.8 }}
-                    className="w-full max-w-lg"
+                    transition={{ delay: 1.1 }}
+                    className="w-full max-w-sm relative"
                 >
-                    <div className="bg-white/5 backdrop-blur-md rounded-xl p-6 border border-rose-300/20 shadow-2xl">
-                        <div className="flex justify-center mb-4">
-                            <Heart className="text-rose-300 w-5 h-5" fill="currentColor" />
-                        </div>
-                        <p className="text-rose-100 text-center whitespace-pre-line leading-loose font-serif italic">
+                    <div className="absolute inset-0 bg-white/[0.03] backdrop-blur-sm rounded-2xl transform rotate-1" />
+                    <div className="relative bg-white/[0.05] border border-white/10 p-8 rounded-2xl shadow-2xl text-center">
+                        <Quote className="absolute top-4 left-4 w-6 h-6 text-rose-300/20 rotate-180" />
+                        <p className="text-rose-50 text-lg md:text-xl font-serif italic leading-relaxed tracking-wide">
                             {poem}
                         </p>
-                        <div className="flex justify-center mt-4">
-                            <Sparkles className="text-rose-300 w-5 h-5" />
+                        <div className="mt-6 flex flex-col items-center">
+                            <div className="h-px w-10 bg-rose-300/30 mb-2" />
+                            <span className="text-rose-300/80 text-xs uppercase tracking-[0.3em] font-sans">
+                                Forever Yours
+                            </span>
                         </div>
                     </div>
                 </motion.div>
 
-                {/* Footer */}
+                {/* Final Accent */}
                 <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.9, duration: 0.8 }}
-                    className="flex items-center gap-3"
+                    animate={{ opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                    className="flex flex-col items-center gap-2"
                 >
-                    <motion.div
-                        className="w-8 h-px bg-gradient-to-r from-transparent to-rose-300"
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ delay: 1, duration: 0.8 }}
-                    />
-                    <Heart className="text-rose-300 w-3 h-3" fill="currentColor" />
-                    <motion.div
-                        className="w-8 h-px bg-gradient-to-l from-transparent to-rose-300"
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ delay: 1, duration: 0.8 }}
-                    />
+                    <Heart className="text-rose-400/40 w-4 h-4" fill="currentColor" />
                 </motion.div>
             </div>
 
-            {/* Overlay */}
-            <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/sakura.png')]" />
+            {/* Luxury Texture Overlay */}
+            <div className="absolute inset-0 opacity-[0.15] pointer-events-none mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')]" />
         </motion.div>
     );
 }

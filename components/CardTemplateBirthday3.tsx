@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Cake, PartyPopper, Gift, Star } from 'lucide-react';
 
 interface CardTemplate3Props {
     name: string;
@@ -15,178 +16,117 @@ export default function CardTemplate3Birthday({ name, poem, imageUrl, language }
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative w-full aspect-[3/4] bg-gradient-to-br from-blue-400 via-pink-400 to-yellow-400 rounded-2xl overflow-hidden shadow-2xl"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative w-full aspect-[3/4] bg-[#FFFAF0] rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white"
         >
-            {/* Cercles Multicolores Festifs */}
+            {/* 1. Fond Dynamique Festif */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-pink-100 to-yellow-100" />
+
+            {/* Cercles de couleurs "Lollipop" */}
             <motion.div
-                className="absolute w-40 h-40 bg-red-400 rounded-full opacity-40"
-                style={{ top: '10%', left: '5%' }}
-                animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
-                transition={{ duration: 5, repeat: Infinity }}
+                animate={{ scale: [1, 1.2, 1], x: [0, 20, 0] }}
+                transition={{ duration: 8, repeat: Infinity }}
+                className="absolute -top-10 -left-10 w-64 h-64 bg-pink-300/30 rounded-full blur-3xl"
             />
             <motion.div
-                className="absolute w-32 h-32 bg-blue-400 rounded-full opacity-40"
-                style={{ top: '60%', right: '10%' }}
-                animate={{ scale: [1, 1.4, 1], rotate: [360, 180, 0] }}
-                transition={{ duration: 6, repeat: Infinity }}
-            />
-            <motion.div
-                className="absolute w-28 h-28 bg-yellow-400 rounded-full opacity-30"
-                style={{ bottom: '20%', left: '15%' }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 4, repeat: Infinity }}
+                animate={{ scale: [1, 1.3, 1], x: [0, -30, 0] }}
+                transition={{ duration: 10, repeat: Infinity }}
+                className="absolute -bottom-10 -right-10 w-80 h-80 bg-blue-300/30 rounded-full blur-3xl"
             />
 
-            {/* Emojis Anniversaire Super Festifs */}
-            <div className="absolute inset-0">
-                {['🎂', '🎈', '🎁', '🎉', '🎊', '🍰'].map((emoji, i) => (
+            {/* 2. Éléments Décoratifs (Confettis statiques + Emojis discrets) */}
+            <div className="absolute inset-0 pointer-events-none">
+                {['🎈', '✨', '🎉', '🎁'].map((emoji, i) => (
                     <motion.div
                         key={i}
-                        className="absolute text-5xl"
-                        style={{
-                            left: `${15 + i * 15}%`,
-                            top: `${20 + (i % 2) * 40}%`,
-                        }}
-                        animate={{
-                            y: [0, -30, 0],
-                            rotate: [0, 20, -20, 0],
-                            scale: [1, 1.3, 1],
-                        }}
-                        transition={{
-                            duration: 1.8 + i * 0.3,
-                            repeat: Infinity,
-                            delay: i * 0.2,
-                        }}
+                        className="absolute text-3xl"
+                        style={{ left: `${10 + i * 25}%`, top: `${15 + (i % 2) * 50}%` }}
+                        animate={{ y: [0, -20, 0], rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 3 + i, repeat: Infinity, ease: "easeInOut" }}
                     >
                         {emoji}
                     </motion.div>
                 ))}
             </div>
 
-            {/* Contenu */}
-            <div className="relative h-full flex flex-col items-center justify-between p-6 z-10">
-                {/* Header Ultra Festif */}
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: 'spring', bounce: 0.7 }}
-                    className="text-center"
-                >
-                    <motion.h1
-                        className="text-5xl font-black text-white mb-2"
-                        style={{
-                            textShadow: '5px 5px 0px rgba(0,0,0,0.3)',
-                        }}
-                        animate={{
-                            rotate: [-4, 4, -4],
-                            scale: [1, 1.05, 1],
-                        }}
-                        transition={{ duration: 0.5, repeat: Infinity }}
-                    >
-                        {title}
-                    </motion.h1>
-                    <div className="flex justify-center gap-2 text-5xl">
-                        <motion.span
-                            animate={{
-                                rotate: [0, 360],
-                                scale: [1, 1.3, 1],
-                            }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                        >
-                            🎉
-                        </motion.span>
-                        <motion.span
-                            animate={{
-                                y: [0, -15, 0],
-                                scale: [1, 1.4, 1],
-                            }}
-                            transition={{ duration: 1.2, repeat: Infinity }}
-                        >
-                            🎂
-                        </motion.span>
-                        <motion.span
-                            animate={{
-                                rotate: [360, 0],
-                                scale: [1, 1.3, 1],
-                            }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                        >
-                            🎈
-                        </motion.span>
-                    </div>
-                </motion.div>
+            {/* 3. Contenu Principal */}
+            <div className="relative h-full flex flex-col items-center justify-between py-10 px-6 z-10">
 
-                {/* Image/Nom avec Cadre Festif */}
-                <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.4, type: 'spring' }}
-                    className="relative"
-                >
-                    <div className="bg-white rounded-3xl p-2 shadow-2xl transform -rotate-1">
-                        <div className="bg-gradient-to-br from-orange-200 via-pink-200 to-purple-200 rounded-2xl p-1">
-                            {imageUrl ? (
-                                <div className="relative w-36 h-36 rounded-2xl overflow-hidden">
-                                    <img
-                                        src={imageUrl}
-                                        alt={name}
-                                        className="w-full h-full object-cover"
-                                        crossOrigin="anonymous"
-                                        loading="lazy"
-                                    />
-                                </div>
-                            ) : (
-                                <div className="w-36 h-36 flex items-center justify-center bg-white rounded-2xl">
-                                    <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500">
-                                        {name}
-                                    </h2>
-                                </div>
-                            )}
+                {/* Header : Titre avec effet Pop */}
+                <div className="text-center">
+                    <motion.div
+                        initial={{ y: -50, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        className="inline-block bg-white px-6 py-2 rounded-full shadow-sm border border-pink-100 mb-4"
+                    >
+                        <div className="flex items-center gap-2">
+                            <Star size={16} className="text-yellow-500 fill-yellow-500" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-pink-500">Special Day</span>
+                            <Star size={16} className="text-yellow-500 fill-yellow-500" />
                         </div>
+                    </motion.div>
+
+                    <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 leading-tight">
+                        {title}
+                    </h1>
+                </div>
+
+                {/* Portrait : Central & Joyeux */}
+                <div className="relative">
+                    <motion.div
+                        animate={{ rotate: [0, 3, -3, 0] }}
+                        transition={{ duration: 6, repeat: Infinity }}
+                        className="relative z-10"
+                    >
+                        <div className="p-3 bg-white rounded-[2rem] shadow-xl rotate-3">
+                            <div className="w-40 h-40 rounded-[1.5rem] overflow-hidden bg-slate-100">
+                                {imageUrl ? (
+                                    <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-400 to-orange-300">
+                                        <Cake size={60} className="text-white" />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Badges Flottants */}
+                        <div className="absolute -bottom-2 -right-4 bg-yellow-400 text-white p-3 rounded-2xl shadow-lg -rotate-12 border-4 border-white">
+                            <PartyPopper size={20} />
+                        </div>
+                    </motion.div>
+
+                    {/* Nom de la personne */}
+                    <div className="mt-6 text-center">
+                        <h2 className="text-3xl font-black text-slate-800 tracking-tighter">
+                            {name}
+                        </h2>
+                        <div className="h-1.5 w-12 bg-pink-500 mx-auto mt-1 rounded-full" />
                     </div>
-                    {/* Ballons et Cadeaux */}
-                    <motion.div
-                        className="absolute -top-5 -right-5 text-5xl"
-                        animate={{
-                            y: [0, -10, 0],
-                            rotate: [0, 15, 0],
-                        }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                    >
-                        🎈
-                    </motion.div>
-                    <motion.div
-                        className="absolute -bottom-5 -left-5 text-5xl"
-                        animate={{
-                            rotate: [0, -10, 10, 0],
-                            scale: [1, 1.2, 1],
-                        }}
-                        transition={{ duration: 2.5, repeat: Infinity }}
-                    >
-                        🎁
-                    </motion.div>
+                </div>
+
+                {/* Message : Glassmorphism pour le confort de lecture */}
+                <motion.div
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="w-full max-w-sm bg-white/60 backdrop-blur-md border border-white rounded-[2rem] p-6 shadow-lg"
+                >
+                    <div className="flex justify-center gap-2 mb-3">
+                        <Gift size={16} className="text-blue-500" />
+                        <div className="h-[1px] w-12 bg-slate-200 self-center" />
+                        <Cake size={16} className="text-pink-500" />
+                    </div>
+
+                    <p className="text-slate-700 text-center font-medium leading-relaxed italic">
+                        "{poem}"
+                    </p>
                 </motion.div>
 
-                {/* Boîte de Poème Festive */}
-                <motion.div
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="bg-white rounded-3xl p-5 shadow-2xl border-4 border-orange-300 max-w-md"
-                >
-                    <div className="text-center mb-2 text-3xl">
-                        🎂 🎉 🎂
-                    </div>
-                    <p className="text-gray-800 text-center whitespace-pre-line leading-relaxed font-bold text-lg">
-                        {poem}
-                    </p>
-                    <div className="text-center mt-2 text-3xl">
-                        🎈 🎊 🎈
-                    </div>
-                </motion.div>
+                {/* Footer discret */}
+                <p className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">
+                    Celebration 2026
+                </p>
             </div>
         </motion.div>
     );
