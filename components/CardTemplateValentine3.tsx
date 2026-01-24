@@ -3,110 +3,136 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { CardTemplateProps } from "@/lib/types";
+import { Heart, Sparkles } from 'lucide-react';
 
-export default function CardTemplateModernArt({ name, poem, imageUrl, language }: CardTemplateProps) {
+export default function CardTemplateValentineFinal({ name, poem, imageUrl, language }: CardTemplateProps) {
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="relative w-full aspect-[3/4] bg-[#F5F2ED] rounded-[2rem] overflow-hidden shadow-2xl border border-black/5"
+            className="relative w-full aspect-[3/4] bg-[#500724] rounded-[3rem] overflow-hidden shadow-[0_20px_80px_rgba(153,27,27,0.5)] border-[4px] border-white/10 group"
         >
-            {/* Formes Géométriques de fond (Abstrait) */}
-            <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-[#E2D1C3] rounded-full blur-3xl opacity-60" />
-            <div className="absolute bottom-[-5%] left-[-5%] w-48 h-48 bg-[#B4A79E] rounded-full blur-2xl opacity-40" />
+            {/* --- TEXTURE : SOIE ROUGE PROFOND --- */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#991b1b] via-[#450a0a] to-[#7f1d1d] z-0" />
+            <div className="absolute inset-0 opacity-30 mix-blend-soft-light pointer-events-none z-0 bg-[url('https://www.transparenttextures.com/patterns/pinstripe.png')]" />
 
-            {/* Typographie Géante en Arrière-plan (Effet Outline) */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-                <span className="text-[12rem] font-black text-black/[0.03] uppercase leading-none rotate-90">
-                    {name}
-                </span>
+            {/* --- ANIMATION : PÉTALES DE ROSES FLOTTANTS --- */}
+            <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
+                {[...Array(8)].map((_, i) => (
+                    <motion.div
+                        key={i}
+                        initial={{ y: -50, x: Math.random() * 400, opacity: 0, rotate: 0 }}
+                        animate={{
+                            y: [0, 600],
+                            x: [null, Math.random() * 300],
+                            opacity: [0, 0.8, 0],
+                            rotate: 360
+                        }}
+                        transition={{
+                            duration: Math.random() * 10 + 10,
+                            repeat: Infinity,
+                            ease: "linear",
+                            delay: i * 2
+                        }}
+                        className="absolute text-rose-300/40"
+                    >
+                        {/* On simule un pétale avec un coeur déformé */}
+                        <Heart size={Math.random() * 20 + 10} fill="currentColor" className="blur-[1px]" />
+                    </motion.div>
+                ))}
             </div>
 
-            <div className="relative h-full flex flex-col p-8 md:p-12 z-10">
+            {/* --- EFFET : GLOW ROSE POUDRÉ --- */}
+            <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-rose-500/30 rounded-full blur-[100px] z-0" />
 
-                {/* Header Style Éditorial */}
-                <header className="flex justify-between items-start mb-8">
-                    <div className="flex flex-col">
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40 mb-1">
-                            {language === 'fr' ? 'Note Personnelle' : 'Personal Note'}
-                        </span>
-                        <div className="h-1 w-12 bg-black" />
-                    </div>
-                    <span className="font-serif italic text-lg text-black/60">No. 001</span>
+            <div className="relative h-full flex flex-col z-20 p-8 md:p-10">
+
+                {/* HEADER : LUXE & OR ROSE */}
+                <header className="flex flex-col items-center mb-6">
+                    <motion.div
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                    >
+                        <Heart className="text-rose-400 fill-rose-400 mb-2 shadow-[0_0_15px_rgba(251,113,133,0.5)]" size={28} />
+                    </motion.div>
+                    <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-rose-300 to-transparent" />
                 </header>
 
-                <div className="flex-1 flex flex-col md:flex-row gap-8 items-center md:items-end">
+                {/* IMAGE : LE MÉDAILLON D'AMOUR */}
+                <div className="relative w-full h-[40%] flex justify-center mb-8">
+                    <div className="relative aspect-square h-full">
+                        {/* Bordures ornementales */}
+                        <div className="absolute inset-[-8px] rounded-full border-2 border-dashed border-rose-300/30 animate-spin-slow" />
+                        <div className="absolute inset-[-15px] rounded-full border-[1px] border-rose-400/20" />
 
-                    {/* Portrait avec masque asymétrique */}
-                    <motion.div
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        className="relative w-48 h-64 md:w-56 md:h-72 shrink-0 shadow-2xl rotate-[-2deg]"
-                    >
-                        {imageUrl ? (
-                            <div className="w-full h-full rounded-2xl overflow-hidden border-[8px] border-white shadow-xl">
+                        <div className="relative h-full w-full rounded-full overflow-hidden border-[6px] border-white shadow-2xl">
+                            {imageUrl ? (
                                 <img
                                     src={imageUrl}
                                     alt={name}
-                                    className="w-full h-full object-cover scale-110 hover:scale-100 transition-transform duration-700"
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                                     crossOrigin="anonymous"
                                 />
-                            </div>
-                        ) : (
-                            <div className="w-full h-full bg-neutral-200 rounded-2xl flex items-center justify-center">
-                                <div className="w-12 h-12 border-2 border-black/10 rounded-full" />
-                            </div>
-                        )}
-                        {/* Petit label scotché */}
-                        <div className="absolute -bottom-4 -right-4 bg-white px-4 py-2 shadow-lg rounded-sm rotate-[5deg]">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-black">
-                                {name}
-                            </span>
+                            ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center">
+                                    <Sparkles size={40} className="text-white/50" />
+                                </div>
+                            )}
+                            {/* Reflet satiné sur la photo */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-rose-500/20 via-transparent to-white/10" />
                         </div>
-                    </motion.div>
-
-                    {/* Zone de texte alignée à droite */}
-                    <motion.div
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.4 }}
-                        className="flex-1 flex flex-col justify-end text-right"
-                    >
-                        <div className="space-y-4">
-                            <div className="max-h-[180px] overflow-y-auto custom-scrollbar-minimal">
-                                <p className="text-xl md:text-2xl font-serif leading-snug text-black/80 italic">
-                                    {poem}
-                                </p>
-                            </div>
-                            <div className="flex justify-end gap-2">
-                                <div className="w-2 h-2 rounded-full bg-black" />
-                                <div className="w-20 h-[1px] bg-black/20 self-center" />
-                            </div>
-                        </div>
-                    </motion.div>
+                    </div>
                 </div>
 
-                {/* Footer Minimaliste */}
-                <footer className="mt-12 flex justify-between items-end border-t border-black/5 pt-6">
-                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/30">
-                        {new Date().getFullYear()} © Studio Art
-                    </p>
-                    <div className="flex gap-4">
-                        <div className="w-3 h-3 border border-black rounded-full" />
-                        <div className="w-3 h-3 bg-black rounded-full" />
+                {/* POÈME : DÉPOSE SUR DE LA DENTELLE MODERNE */}
+                <div className="flex-1 flex flex-col items-center">
+                    <h2 className="text-3xl md:text-4xl font-serif font-bold text-rose-100 mb-4 tracking-tight drop-shadow-md">
+                        {name}
+                    </h2>
+
+                    <div className="relative w-full bg-white/5 backdrop-blur-md rounded-[2rem] p-6 border border-white/10 shadow-inner">
+                        <div className="max-h-[140px] overflow-y-auto custom-scrollbar-valentine pr-2">
+                            <p className="text-lg md:text-xl font-medium leading-relaxed text-rose-50/90 font-serif italic text-center">
+                                "{poem}"
+                            </p>
+                        </div>
+                        {/* Petites icônes décoratives */}
+                        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#500724] px-4 py-1 rounded-full border border-white/10 text-rose-300 flex gap-2">
+                            <Sparkles size={10} />
+                            <Sparkles size={10} />
+                            <Sparkles size={10} />
+                        </div>
                     </div>
+                </div>
+
+                {/* FOOTER : SIGNATURE ÉLÉGANTE */}
+                <footer className="mt-8 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-rose-300/60 mb-1">
+                        {language === 'fr' ? 'Mon Cœur à Toi' : 'My Heart is Yours'}
+                    </p>
+                    <p className="text-[12px] font-serif italic text-white/30 tracking-widest">
+                        Saint-Valentin 2026
+                    </p>
                 </footer>
             </div>
 
             <style jsx>{`
-                .custom-scrollbar-minimal::-webkit-scrollbar {
-                    width: 2px;
+                .custom-scrollbar-valentine::-webkit-scrollbar {
+                    width: 3px;
                 }
-                .custom-scrollbar-minimal::-webkit-scrollbar-track {
+                .custom-scrollbar-valentine::-webkit-scrollbar-track {
                     background: transparent;
                 }
-                .custom-scrollbar-minimal::-webkit-scrollbar-thumb {
-                    background: rgba(0, 0, 0, 0.1);
+                .custom-scrollbar-valentine::-webkit-scrollbar-thumb {
+                    background: rgba(244, 114, 182, 0.3);
+                    border-radius: 10px;
+                }
+                @keyframes spin-slow {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+                .animate-spin-slow {
+                    animation: spin-slow 15s linear infinite;
                 }
             `}</style>
         </motion.div>

@@ -7,7 +7,8 @@ import {
     Star,
     Gift,
     PartyPopper,
-    Cake
+    Cake,
+    Crown
 } from 'lucide-react';
 
 interface CardTemplate1Props {
@@ -17,256 +18,159 @@ interface CardTemplate1Props {
     language: 'fr' | 'en';
 }
 
-export default function CardTemplate1Birthday({ name, poem, imageUrl, language }: CardTemplate1Props) {
+export default function CardTemplateBirthdayPremium({ name, poem, imageUrl, language }: CardTemplate1Props) {
     const title = language === 'fr' ? 'Joyeux Anniversaire' : 'Happy Birthday';
 
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative w-full aspect-[3/4] bg-[#1a1a2e] rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(255,152,0,0.4)] border-4 border-orange-200/20"
+            className="relative w-full aspect-[3/4] bg-[#0F172A] rounded-[3rem] overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.5)] border-[1px] border-white/10 group"
         >
-            {/* Fond Festif Coloré */}
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-pink-500 to-blue-600" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_0%,transparent_70%)]" />
+            {/* --- FOND : MESH GRADIENT "NIGHT PARTY" --- */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,#4338ca_0%,transparent_40%),radial-gradient(circle_at_80%_80%,#db2777_0%,transparent_40%),radial-gradient(circle_at_50%_50%,#1e1b4b_0%,#0f172a_100%)]" />
 
-            {/* Confettis Animés */}
-            <div className="absolute inset-0 pointer-events-none">
-                {[...Array(30)].map((_, i) => {
-                    const colors = ['bg-yellow-400', 'bg-pink-400', 'bg-blue-400', 'bg-green-400', 'bg-purple-400', 'bg-red-400'];
-                    return (
-                        <motion.div
-                            key={i}
-                            className={`absolute w-2 h-3 ${colors[i % 6]} rounded-sm`}
-                            style={{
-                                left: `${Math.random() * 100}%`,
-                                top: '-5%',
-                            }}
-                            animate={{
-                                y: ['0vh', '110vh'],
-                                x: [0, Math.sin(i) * 50, Math.cos(i) * 50],
-                                rotate: [0, 360, 720],
-                            }}
-                            transition={{
-                                duration: Math.random() * 5 + 5,
-                                repeat: Infinity,
-                                ease: 'linear',
-                                delay: Math.random() * 5,
-                            }}
-                        />
-                    );
-                })}
-            </div>
+            {/* TEXTURE DE GRAIN / POUSSIÈRE D'ÉTOILE */}
+            <div className="absolute inset-0 opacity-[0.15] pointer-events-none z-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
 
-            {/* Ballons Flottants */}
-            <div className="absolute inset-0 pointer-events-none">
-                {[...Array(6)].map((_, i) => {
-                    const colors = ['text-red-400', 'text-blue-400', 'text-yellow-400', 'text-green-400', 'text-purple-400', 'text-pink-400'];
-                    return (
-                        <motion.div
-                            key={`balloon-${i}`}
-                            className={`absolute ${colors[i]}`}
-                            style={{
-                                left: `${10 + i * 15}%`,
-                                bottom: '-10%',
-                            }}
-                            animate={{
-                                y: [0, -10, 0],
-                                x: [0, Math.sin(i) * 10, 0],
-                            }}
-                            transition={{
-                                duration: 3 + i * 0.5,
-                                repeat: Infinity,
-                                ease: 'easeInOut',
-                            }}
-                        >
-                            <div className="relative">
-                                <div className="w-8 h-10 rounded-full opacity-40" style={{ background: 'currentColor' }} />
-                                <div className="w-[1px] h-12 bg-current opacity-30 mx-auto" />
-                            </div>
-                        </motion.div>
-                    );
-                })}
-            </div>
-
-            {/* Étoiles Scintillantes */}
-            <div className="absolute inset-0 pointer-events-none">
+            {/* --- CONFETTIS GÉOMÉTRIQUES ANIMÉS --- */}
+            <div className="absolute inset-0 pointer-events-none z-10">
                 {[...Array(20)].map((_, i) => (
                     <motion.div
-                        key={`star-${i}`}
-                        className="absolute"
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                        }}
+                        key={i}
+                        initial={{ y: -20, opacity: 0 }}
                         animate={{
-                            scale: [0, 1.5, 0],
-                            opacity: [0, 1, 0],
-                            rotate: [0, 180, 360],
+                            y: [0, 600],
+                            x: [0, Math.sin(i) * 100],
+                            rotate: 360,
+                            opacity: [0, 1, 0]
                         }}
                         transition={{
-                            duration: 2,
+                            duration: Math.random() * 5 + 7,
                             repeat: Infinity,
-                            delay: Math.random() * 3,
+                            ease: "linear",
+                            delay: i * 0.5
                         }}
-                    >
-                        <Star className="text-yellow-200" size={8} fill="currentColor" />
-                    </motion.div>
+                        className={`absolute w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${
+                            i % 3 === 0 ? 'bg-yellow-400' : i % 3 === 1 ? 'bg-pink-500' : 'bg-cyan-400'
+                        } blur-[0.5px]`}
+                        style={{ left: `${Math.random() * 100}%` }}
+                    />
                 ))}
             </div>
 
-            {/* Cadre Festif */}
-            <div className="absolute inset-6 border-2 border-yellow-300/40 rounded-[1.5rem]" />
-            <div className="absolute top-4 left-4 text-yellow-300"><PartyPopper size={24} /></div>
-            <div className="absolute top-4 right-4 text-pink-300"><Gift size={24} /></div>
-            <div className="absolute bottom-4 left-4 text-blue-300"><Sparkles size={24} /></div>
-            <div className="absolute bottom-4 right-4 text-orange-300"><Cake size={24} /></div>
+            {/* --- CONTENU --- */}
+            <div className="relative h-full flex flex-col z-20 p-6 md:p-10">
 
-            {/* Contenu Principal */}
-            <div className="relative h-full flex flex-col items-center justify-between py-12 px-8 z-10 text-center">
-
-                {/* Header avec Animation */}
-                <motion.div
-                    initial={{ y: -20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                >
+                {/* HEADER : ICONES NÉON */}
+                <header className="flex justify-between items-start mb-4 md:mb-8">
                     <motion.div
-                        className="flex items-center justify-center gap-3 mb-3"
-                        animate={{
-                            rotate: [0, 10, -10, 0],
-                            scale: [1, 1.1, 1],
-                        }}
-                        transition={{ duration: 2, repeat: Infinity }}
+                        animate={{ rotate: [-10, 10, -10] }}
+                        transition={{ duration: 4, repeat: Infinity }}
+                        className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.1)]"
                     >
-                        <PartyPopper className="text-yellow-200 w-6 h-6" />
-                        <Cake className="text-pink-200 w-6 h-6" />
-                        <PartyPopper className="text-blue-200 w-6 h-6" />
+                        <Crown className="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]" size={24} />
                     </motion.div>
-                    <h1 className="text-3xl md:text-4xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-pink-200 to-blue-200 drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]">
-                        {title}
-                    </h1>
-                </motion.div>
+                    <div className="text-right">
+                        <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/40">VIP Invitation</span>
+                        <div className="flex gap-1 justify-end mt-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-pink-500 shadow-[0_0_8px_#db2777]" />
+                            <div className="w-8 h-[2px] bg-pink-500/20 self-center" />
+                        </div>
+                    </div>
+                </header>
 
-                {/* Portrait ou Nom */}
-                <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.4, type: 'spring' }}
-                    className="relative"
-                >
-                    {imageUrl ? (
-                        <div className="relative group">
-                            <motion.div
-                                className="absolute inset-0 bg-gradient-to-r from-orange-400/40 to-pink-400/40 blur-2xl rounded-full scale-110"
-                                animate={{
-                                    scale: [1.1, 1.4, 1.1],
-                                    rotate: [0, 180, 360],
-                                }}
-                                transition={{ duration: 5, repeat: Infinity }}
-                            />
-                            <div className="relative w-40 h-40 rounded-full border-[6px] border-white shadow-[0_0_30px_rgba(255,152,0,0.6)] overflow-hidden">
+                {/* VISUEL CENTRAL : PORTRAIT ÉCLATANT --- */}
+                <div className="flex-1 flex flex-col items-center justify-center gap-6">
+                    <div className="relative group">
+                        {/* Cercles d'énergie derrière la photo */}
+                        <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-[-15px] border border-dashed border-white/20 rounded-full"
+                        />
+                        <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 4, repeat: Infinity }}
+                            className="absolute inset-[-30px] bg-gradient-to-tr from-indigo-500/20 to-pink-500/20 blur-[40px] rounded-full"
+                        />
+
+                        {imageUrl ? (
+                            <div className="relative w-36 h-36 md:w-52 md:h-52 rounded-full border-[6px] border-white/90 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
                                 <img
                                     src={imageUrl}
                                     alt={name}
-                                    className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700"
+                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                     crossOrigin="anonymous"
-                                    loading="lazy"
                                 />
+                                <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/40 to-transparent" />
                             </div>
-                            {/* Étoiles décoratives tournantes */}
-                            {[...Array(4)].map((_, i) => (
-                                <motion.div
-                                    key={i}
-                                    className="absolute"
-                                    style={{
-                                        top: '50%',
-                                        left: '50%',
-                                    }}
-                                    animate={{
-                                        rotate: [0 + (i * 90), 360 + (i * 90)],
-                                        x: [0, 80 * Math.cos((i * Math.PI) / 2)],
-                                        y: [0, 80 * Math.sin((i * Math.PI) / 2)],
-                                    }}
-                                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                                >
-                                    <Star size={12} className="text-yellow-300" fill="currentColor" />
-                                </motion.div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="py-4">
-                            <h2 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-200 via-pink-200 to-blue-200 tracking-tighter drop-shadow-[0_5px_15px_rgba(255,152,0,0.5)]">
+                        ) : (
+                            <div className="relative w-36 h-36 md:w-52 md:h-52 rounded-full bg-white/5 backdrop-blur-xl border-2 border-white/20 flex items-center justify-center">
+                                <span className="text-5xl md:text-7xl font-black text-white/10 uppercase tracking-tighter">{name[0]}</span>
+                            </div>
+                        )}
+
+                        {/* Badge Nom flottant */}
+                        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-6 py-2 bg-white rounded-full shadow-xl">
+                            <h2 className="text-sm md:text-lg font-black text-indigo-950 whitespace-nowrap uppercase tracking-widest">
                                 {name}
                             </h2>
-                            <motion.div
-                                className="w-16 h-1 bg-gradient-to-r from-orange-400 via-pink-400 to-blue-400 mx-auto mt-2 rounded-full shadow-[0_0_15px_rgba(255,152,0,0.8)]"
-                                animate={{ scaleX: [1, 1.3, 1] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                            />
                         </div>
-                    )}
-                </motion.div>
+                    </div>
 
-                {/* Zone du Poème */}
+                    <div className="mt-8 text-center">
+                        <h1 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-white drop-shadow-[0_5px_15px_rgba(0,0,0,0.3)]">
+                            {title}
+                        </h1>
+                    </div>
+                </div>
+
+                {/* ZONE DE TEXTE : GLASSMORPHE --- */}
                 <motion.div
-                    initial={{ y: 30, opacity: 0 }}
+                    initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="w-full max-w-sm"
+                    className="w-full max-w-sm mx-auto mt-6 bg-white/10 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]"
                 >
-                    <div className="relative p-6 rounded-3xl bg-white/15 backdrop-blur-xl border border-white/30 shadow-2xl overflow-hidden group">
-                        <motion.div
-                            className="absolute top-2 right-2 text-yellow-300/10"
-                            animate={{
-                                rotate: [0, 360],
-                            }}
-                            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                        >
-                            <Gift size={60} />
-                        </motion.div>
-
-                        <p className="text-white text-sm md:text-base leading-relaxed font-medium italic relative z-10">
-                            {poem}
+                    <div className="max-h-[120px] md:max-h-[150px] overflow-y-auto custom-scrollbar-bday pr-2">
+                        <p className="text-sm md:text-lg font-medium leading-relaxed text-white/90 italic text-center font-serif">
+                            "{poem}"
                         </p>
                     </div>
                 </motion.div>
 
-                {/* Footer Festif */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
-                    className="flex flex-col items-center gap-3"
-                >
-                    <div className="flex -space-x-2">
-                        {['bg-red-400', 'bg-orange-400', 'bg-yellow-400', 'bg-green-400', 'bg-blue-400'].map((color, i) => (
-                            <motion.div
-                                key={i}
-                                className={`w-8 h-8 rounded-full ${color} border-2 border-white/50 flex items-center justify-center shadow-lg`}
-                                animate={{
-                                    y: [0, -8, 0],
-                                    scale: [1, 1.2, 1],
-                                }}
-                                transition={{
-                                    duration: 1.5,
-                                    repeat: Infinity,
-                                    delay: i * 0.1
-                                }}
-                            >
-                                <Star size={10} className="text-white" fill="currentColor" />
-                            </motion.div>
-                        ))}
+                {/* FOOTER : TECH & PARTY --- */}
+                <footer className="mt-8 flex justify-between items-end">
+                    <div className="flex gap-3">
+                        <div className="p-2 rounded-lg bg-pink-500/20 text-pink-400 border border-pink-500/30">
+                            <Gift size={18} />
+                        </div>
+                        <div className="p-2 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                            <Cake size={18} />
+                        </div>
                     </div>
-
-                    <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-yellow-100/80">
-                        Célébration Spéciale
-                    </span>
-                </motion.div>
+                    <div className="text-right">
+                        <div className="flex items-center gap-2 justify-end mb-1">
+                            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                            <span className="text-[8px] font-black text-white/60 uppercase tracking-widest">Live Celebration</span>
+                        </div>
+                        <p className="text-[10px] font-mono text-white/30 italic">EST. 2026 • STUDIO ART</p>
+                    </div>
+                </footer>
             </div>
 
-            {/* Overlay Festif */}
-            <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
+            <style jsx>{`
+                .custom-scrollbar-bday::-webkit-scrollbar {
+                    width: 3px;
+                }
+                .custom-scrollbar-bday::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar-bday::-webkit-scrollbar-thumb {
+                    background: rgba(255, 255, 255, 0.2);
+                    border-radius: 10px;
+                }
+            `}</style>
         </motion.div>
     );
 }
