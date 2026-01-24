@@ -76,6 +76,7 @@ function BatchContent() {
 
                 const headers = lines[0].split(',').map(h => h.trim());
 
+
                 const nameIndex = headers.indexOf('name');
                 const genderIndex = headers.indexOf('gender');
                 const emailIndex = headers.indexOf('email');
@@ -91,9 +92,24 @@ function BatchContent() {
                         const cols = line.split(',').map(c => c.trim());
 
                         const name = cols[nameIndex];
-                        const gender = cols[genderIndex] as BatchContact['gender'];
+                        const rawGender = cols[genderIndex]?.toLowerCase().trim();
 
-                        if (!name || !['boy', 'girl', 'neutral'].includes(gender)) {
+                        const genderMap: Record<string, BatchContact['gender']> = {
+                            boy: 'boy',
+                            male: 'boy',
+                            homme: 'boy',
+
+                            girl: 'girl',
+                            female: 'girl',
+                            femme: 'girl',
+
+                            neutral: 'neutral',
+                            autre: 'neutral',
+                        };
+
+                        const gender = genderMap[rawGender];
+
+                        if (!name || !gender) {
                             return null;
                         }
 
@@ -105,6 +121,7 @@ function BatchContent() {
                         };
                     })
                     .filter((c): c is BatchContact => c !== null);
+
 
                 if (contacts.length === 0) {
                     throw new Error('No valid contacts found');
