@@ -21,8 +21,7 @@ export async function POST(request: NextRequest) {
             eventType as EventType
         );
 
-        // ✅ ON RENVOIE JUSTE LES POÈMES.
-        // L'enregistrement se fera plus tard dans /api/create-card
+
         return NextResponse.json({ poems });
 
     } catch (error) {
