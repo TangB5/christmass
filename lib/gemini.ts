@@ -6,7 +6,7 @@ import { getEventConfig } from "./events";
 /* ================= CONFIG ================= */
 
 const API_KEY = process.env.GEMINI_API_KEY!;
-const MODEL = "gemini-2.5-flash"; // ✅ stable
+const MODEL = "gemini-2.5-flash";
 const MAX_RETRIES = 4;
 const TIMEOUT_MS = 20000;
 const MAX_POEMS = 10;
